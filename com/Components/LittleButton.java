@@ -11,9 +11,11 @@ public class LittleButton extends JButton {
     public Color BUTTON_COLOR1=new  Color(0x53B880);//未选中填充颜色
     public   Color BUTTON_COLOR2=new Color(0x0E552E);// 选中填充颜色
     public   Color BUTTON_COLOR3=new Color(0xFCC7BD00, true);
+    public  Color  BUTTON_COLOR4=new Color(0x005DFE);
     public   Color BUTTON_FOREGROUND_COLOR = Color.WHITE;
     int choice=0;//0 未选中，1选中未点击，2点中
     String name;
+
     public LittleButton(String name){
         super(name);
         this.name=name;
@@ -54,7 +56,8 @@ public class LittleButton extends JButton {
         BUTTON_COLOR3=c;
     }
     public void setChoice( int i){
-        if(i>2) i=2;
+         if (i>3) i=3;
+
         if(i<0) i=0;
         this.choice=i;
         repaint();
@@ -75,13 +78,18 @@ public class LittleButton extends JButton {
             g2d.setColor(Color.black);
             Font font=new Font("微软黑体",1,35);
             g2d.setFont(font);
-            g2d.drawString(name,15,38);
+            if(name.length()==1)
+                g2d.drawString(name,15,38);
+            else g2d.drawString(name,5,38);
         } else if(choice==1){
             tran=1f;
         }
-        else {
+        else if(choice==2) {
             tran=1f;
             gp=new GradientPaint(0f,0f,BUTTON_COLOR1,0F,h,BUTTON_COLOR1,true);
+        }else {
+            tran=1f;
+            gp=new GradientPaint(0f,0f,BUTTON_COLOR4,0F,h,BUTTON_COLOR4,true);
         }
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -97,8 +105,10 @@ public class LittleButton extends JButton {
         g2d.setColor(Color.white);
         Font font=new Font("微软黑体",1,35);
         g2d.setFont(font);
+        if(name.length()==1)
         g2d.drawString(name,15,35);
-        g2d.dispose();
+        else g2d.drawString(name,5,35);
+            g2d.dispose();
 
     }
 }

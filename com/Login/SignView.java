@@ -18,6 +18,7 @@ public class SignView extends JFrame {
     JComboBox jc_identity;
     JPanel  jp_sign_center,jp_sign_bottom;
     JLabel  jl_informatoion,jl_warning;
+    RButton login_btn,sign_btn;
     public  SignView(){
         super();
         JFrame self=this;
@@ -60,16 +61,14 @@ public class SignView extends JFrame {
         jc_identity.addItem("教师");
         jc_identity.setBorder(b2);
         Border padding2=BorderFactory.createEmptyBorder(0,20,0,0);
-        RButton login_btn=new RButton("返回登录");
+        login_btn=new RButton("返回登录");
         login_btn.setPreferredSize(new Dimension(300,60));
         login_btn.setBorder(padding2);
         login_btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                LoginView loginView =new  LoginView();
-                loginView.setVisible(true);
-                self.setVisible(false);
+                self.dispose();
             }
         });
 
@@ -92,8 +91,19 @@ public class SignView extends JFrame {
         jp_sign_center.add(jp1);
 
         jp_sign_bottom=new JPanel();
+        sign_btn=new RButton("注册");
+        sign_btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
 
-        RButton sign_btn=new RButton("注册");
+                if(!jt_repassord.getPassword().equals(jt_password))
+                    jl_warning.setText("两次密码需要相同");
+                if(jt_password.getPassword().length<8||jt_password.getPassword().length>20){
+                    jl_warning.setText("密码长度应该在8到20位");
+                }
+            }
+        });
 
         sign_btn.setPreferredSize(new Dimension(300,60));
 
@@ -108,6 +118,14 @@ public class SignView extends JFrame {
         this.setLocation((screen_width-350)/2,(screen_height-600)/2);
         this.setVisible(true);
 
+    }
+
+    public RButton getLogin_btn() {
+        return login_btn;
+    }
+
+    public RButton getSign_btn() {
+        return sign_btn;
     }
 }
 
