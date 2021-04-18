@@ -1,0 +1,85 @@
+# java-
+山东大学2021 java 课设 考试平台设计与开发
+package DataBase_dao;
+import DataBase_model.Student;
+import DataBase_model.Teacher;
+import com.mysql.cj.xdevapi.PreparableStatement;
+
+import java.sql.*;
+
+public class TeacherDao {
+
+    public Teacher login(Connection conn,Teacher teacher)throws Exception{
+        Teacher resultteacher=null;
+        String sql="select * from teacher where teacher_id=? and password=?";
+        PreparedStatement psmtm=conn.prepareStatement(sql);
+        psmtm.setString(1,teacher.getId());
+        psmtm.setString(2,teacher.getPassword());
+        ResultSet rt=psmtm.executeQuery();
+        if(rt.next()){
+
+            if(rt.getString("teacher_id").equals(teacher.getId())){
+            resultteacher=new Teacher();
+            resultteacher.setId(rt.getString("teacher_id"));
+            resultteacher.setPassword(rt.getString("password"));
+            System.out.println(rt.getString("password"));}
+        }
+        psmtm.close();
+        conn.close();
+        return  resultteacher;
+    }
+
+    public int insert(Connection conn,Teacher teacher)throws  Exception{
+        int i = 0;
+        String sql = "insert into teacher(student_id,password,is_teacher) values(?,?,?)";
+        PreparedStatement pstmtm;
+        try {
+
+            pstmtm = (PreparedStatement) conn.prepareStatement(sql);
+            pstmtm.setString(1, teacher.getId());
+            pstmtm.setString(2, teacher.getPassword());
+            pstmtm.setString(3, teacher.getIs_teacher());
+            i = pstmtm.executeUpdate();
+            pstmtm.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return i;
+    }
+
+
+    public  int update(Connection conn, Student student) {
+
+        int i = 0;
+        String sql = "update teacher set teacher_id='" + student.getId() + "' where password='" + student.getPassword()+ "'";
+        PreparedStatement pstmtm;
+        try {
+            pstmtm = (PreparedStatement) conn.prepareStatement(sql);
+            i = pstmtm.executeUpdate();
+            System.out.println("resutlt: " + i);
+            pstmtm.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return i;
+    }
+
+    public String delete(Connection conn,String teacher_id) {
+
+        String i = null;
+        String sql = "delete from students where student_id='" + teacher_id + "'";
+        PreparedStatement pstmtm;
+        try {
+            pstmtm = (PreparedStatement) conn.prepareStatement(sql);
+            i = String.valueOf(pstmtm.executeUpdate());
+            System.out.println("resutl: " + i);
+            pstmtm.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return i;
+    }
+}
