@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -42,7 +43,8 @@ public class ExamView extends JFrame {
             questions.add(question);
             arr_ans.add(new Ans(i));
         }
-        jp_question_area=new JPanel(new FlowLayout(FlowLayout.CENTER,0,50));
+        jp_question_area=new BgPanel( new File("resource/moonbg.jpg"));
+        jp_question_area.setLayout (new FlowLayout(FlowLayout.CENTER,0,50));
         jp_sidebar=new JPanel();
         jp_top=new JPanel_shadowText("JAVA考试答题界面");
 
@@ -260,7 +262,7 @@ public class ExamView extends JFrame {
         add(jp_bottom);
         this.getContentPane().setBackground(Color.white);
         this.setResizable(false);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
     private void  updateQuestionArea(int id){

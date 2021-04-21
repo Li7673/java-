@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 public class MultipleChoice_Question extends Question{
     ArrayList<String> choice_box;
-
+    public MultipleChoice_Question(){
+        this.type=1;
+    };
     public MultipleChoice_Question(String description , int id , ArrayList<String> choice_box){
         this.description=description;
         this.id=id;

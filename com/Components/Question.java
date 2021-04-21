@@ -3,7 +3,7 @@ package com.Components;
 public  class  Question {
     protected String description;
     protected int  id,type,difficulty;
-
+    public String right_ans;
     public int getType() {
         return type;
     }

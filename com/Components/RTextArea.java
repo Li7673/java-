@@ -20,7 +20,8 @@ public class RTextArea  extends JTextArea{
         Border b2=BorderFactory.createDashedBorder(gp2,3.0F,1.0F,0.0F,false);
         Border b3=BorderFactory.createDashedBorder(gp3,3.0F,1.0F,0.0F,false);
         this.setBorder(b2);
-
+        this.setLineWrap(true);
+        this.setWrapStyleWord(true);
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

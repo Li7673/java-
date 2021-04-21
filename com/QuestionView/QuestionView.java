@@ -1,4 +1,4 @@
-package QuestionView;
+package com.QuestionView;
 
 import com.Components.Blank_Question;
 import com.Components.JPanel_shadowText;
@@ -68,7 +68,7 @@ public class QuestionView extends JFrame {
 
         //测试数据
         Blank_Question c = new Blank_Question("李志豪难到不是蠢货，弱智吗，不会吧？不会吧？ 李志豪今天必死 啊就哦跑j opj o jpjopjop", 5);
-        c.setDifficulty(51);
+        c.setDifficulty(1);
         Question_show_box question_show_box = new Question_show_box(c);
 
         question_show_box.setSize(1100, 100);
@@ -84,11 +84,26 @@ public class QuestionView extends JFrame {
 
 
         //side
-        JPanel jp_side=new JPanel();
-        JLabel jl_side_top=new JLabel("题目管理");
+        JPanel jp_side=new JPanel(new FlowLayout(FlowLayout.LEFT,5,30));
+        JLabel jl_side_top=new JLabel("   题目管理");
+        jl_side_top.setPreferredSize(new Dimension(210,50));
+        jl_side_top.setFont(new Font("华文楷体",1,30));
         JButton jb_add=new RButton("增加题目");
-        
-
+        JButton jb_new_a_paper=new RButton("自动组卷");
+        jb_add.setPreferredSize(new Dimension(210,50));
+        jb_new_a_paper.setPreferredSize(new Dimension(210,50));
+        jb_add.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Single_question_view single_question_view=new Single_question_view();
+            }
+        });
+        jp_side.setSize(220,600);
+        jp_side.setLocation(20,100);
+        jp_side.add(jl_side_top);
+        jp_side.add(jb_add);
+        jp_side.add(jb_new_a_paper);
+        jp_side.setBackground(Color.white);
 
 
         jp_questions.setPreferredSize(new Dimension(1120, 400));
@@ -103,6 +118,7 @@ public class QuestionView extends JFrame {
         add(table_columns);
         add(js_box);
         add(jp_top);
+        add(jp_side);
         this.setSize(width, height);
         this.setLocation((screen_width - width) / 2, (screen_height - height) / 2);
         this.setVisible(true);
@@ -114,6 +130,15 @@ class Question_show_box extends JPanel {
     int id;
     JLabel jl_id, jl_description, jl_type, jl_difficulty;
     JPanel jp_button_box;
+    boolean is_selected;
+    JCheckBox jc_choice;
+    public boolean isIs_selected() {
+        return is_selected;
+    }
+
+    public void setIs_selected(boolean is_selected) {
+        this.is_selected = is_selected;
+    }
 
     public Question_show_box(Question question) {
         JPanel self = this;
@@ -132,6 +157,12 @@ class Question_show_box extends JPanel {
         Dimension d_size = new Dimension(40, 40);
         jb_change.setPreferredSize(d_size);
         jb_del.setPreferredSize(d_size);
+        jb_change.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Single_question_view single_question_view=new Single_question_view(question);
+            }
+        });
 
 
 
@@ -171,16 +202,29 @@ class Question_show_box extends JPanel {
             @Override
             public void mouseEntered(MouseEvent e) {
                 super.mouseEntered(e);
+                if(!is_selected)
                 self.setBackground(new Color(0xFF99BBFD, true));
 
             }
+            @Override
+            public  void mouseClicked(MouseEvent e){
+                is_selected=!is_selected;
+                if(is_selected)
+                    self.setBackground(Color.blue);
+                else self.setBackground(Color.white);
 
+
+            }
             @Override
             public void mouseExited(MouseEvent e) {
                 super.mouseExited(e);
-                self.setBackground(Color.white);
+               if(!is_selected)
+               self.setBackground(Color.white);
+
             }
         });
+
+
 
         add(jl_id);
         add(jl_type);

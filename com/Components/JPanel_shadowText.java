@@ -14,6 +14,7 @@ public class JPanel_shadowText extends JPanel {
 
         int x = 400;
         int y = 60;
+        this.setOpaque(false);
         Font font = new Font("宋体",Font.BOLD,54);
         g.setFont(font);
         g.setColor(Color.GRAY);
@@ -30,7 +31,6 @@ public class JPanel_shadowText extends JPanel {
         Graphics2D g2d=(Graphics2D)g;
         g2d.setStroke(new BasicStroke(3.0f));
         g2d.drawLine(0,100,1200,100);
-
     }
 
 }

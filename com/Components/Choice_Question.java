@@ -5,6 +5,9 @@ import java.util.ArrayList;
 public class Choice_Question extends Question{
     ArrayList<String> choice_box;
     public  int type;
+    public Choice_Question(){
+        this.type=0;
+    }
     public Choice_Question (String description ,int id , int type,ArrayList<String> choice_box){
         this.description=description;
         this.id=id;

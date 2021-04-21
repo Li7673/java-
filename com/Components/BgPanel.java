@@ -16,7 +16,7 @@ public class BgPanel extends JPanel {
             e.getStackTrace();
             System.out.println(e.toString());
         }}
-    public void paintComponent(Graphics g) {
+    public void paint(Graphics g) {
         int w=this.getWidth();
         int h=this.getHeight();
         g.clearRect(0,0,w,h);

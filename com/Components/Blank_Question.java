@@ -6,4 +6,7 @@ public class   Blank_Question extends Question{
         this.id=id;
         this.type=2;
     }
+    public Blank_Question(){
+    this.type=2;
+    }
 }
