@@ -5,6 +5,8 @@ import com.Components.Choice_Question;
 import com.Components.MultipleChoice_Question;
 import com.Components.Question;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -82,4 +84,65 @@ public class QuestionDeal {
         }
         return  questions;
     }
+
+    //id从数据库中抓题目
+    public static String Question_DataBase_to_String(int database_id){
+        Sql_connection sql_connection=new Sql_connection();
+        sql_connection.sql_start();
+        String text=null;
+        try {
+            ResultSet set=sql_connection.sql_deal("select * from "+NetConf.questions_table+" where id="+database_id);
+            while (set.next())
+            {   int type=Integer.valueOf( set.getString("type"));
+                if(type==0||type==1)
+                {
+                    text="~#id="+database_id+"#type="+type+"#description="+set.getString("description")
+                            +"#difficulty="+set.getString("difficulty")+"#choice_ans="
+                            +set.getString("ans").replace("@","")
+                            +"#";
+                }
+                else {
+                    text="~#id="+database_id+"#type="+type+"#description="+set.getString("description")
+                            +"#difficulty="+set.getString("difficulty")+
+                            "#ans"+set.getString("ans")
+                            +"#";
+                }
+            }
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+        }
+        sql_connection.sql_end();
+        return  text;
+    }
+    public static String Question_DataBase_to_String(int database_id,int now_id){
+        Sql_connection sql_connection=new Sql_connection();
+        sql_connection.sql_start();
+        String text=null;
+        try {
+            ResultSet  set=sql_connection.sql_deal("select * from questions where id="+database_id);
+            while (set.next())
+            {
+                int type=Integer.valueOf( set.getString("type"));
+                if(type==0||type==1)
+                {
+                    text="~#id="+now_id+"#type="+type+"#description="+set.getString("description")
+                            +"#difficulty="+set.getString("difficulty")+"#choice_ans="
+                            +set.getString("ans").replace("@","")
+                            +"#";
+                }
+                else {
+                    text="~#id="+now_id+"#type="+type+"#description="+set.getString("description")
+                            +"#difficulty="+set.getString("difficulty")+
+                            "#ans"+set.getString("ans")
+                            +"#";
+                }
+            }
+        } catch (SQLException throwables) {
+
+             throwables.printStackTrace();
+        } sql_connection.sql_end();
+        return  text;
+    }
+
 }

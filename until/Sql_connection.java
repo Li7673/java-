@@ -11,7 +11,7 @@ public class Sql_connection {
     public void sql_start() {
         try {
             Class.forName(NetConf.getDatabase_driverClassName);
-            con = DriverManager.getConnection(NetConf.database_url, NetConf.database_user, NetConf.database_user);
+            con = DriverManager.getConnection(NetConf.database_url, NetConf.database_user, NetConf.database_passwd);
             statement = con.createStatement();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
