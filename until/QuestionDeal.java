@@ -9,9 +9,40 @@ import java.util.Vector;
 
 public class QuestionDeal {
 
+    public  static  int countQuestion(int type){
+        Sql_connection sql_connection=new Sql_connection();
+        sql_connection.sql_start();
+        int  count=0;
+        String sql="select * from "+NetConf.questions_table;
+        try {
+            ResultSet resultSet= sql_connection.sql_deal(sql);
+            while (resultSet.next()){
+                if(Integer.parseInt( resultSet.getString("type"))==type)
+                count++;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+         return count;
+    }
+    public static int countQuestionByDifficulty(int di){
+        Sql_connection sql_connection=new Sql_connection();
+        sql_connection.sql_start();
+        int  count=0;
+        String sql="select * from "+NetConf.questions_table;
+        try {
+            ResultSet resultSet= sql_connection.sql_deal(sql);
+            while (resultSet.next()){
+                if(Integer.parseInt( resultSet.getString("difficulty"))==di)
+                    count++;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return count;
+    }
     public static String toAnsString(Vector<Ans> ansVector) {
         String s_ans = "";
-
         for (Ans ans : ansVector)
             s_ans += "~#type=" + ans.getType() + "#id=" + ans.getQuestion_id() + "#ans=" + ans.getAns();
         s_ans += "#";
@@ -63,7 +94,7 @@ public class QuestionDeal {
                     int x = s.indexOf("#type=");
                     int type = Integer.parseInt(s.substring(x + 6, x + 7));
                     if (type == 0) {
-                        String id = s.substring(s.indexOf("#id=") + 4, s.indexOf("#", s.indexOf("#id") + 5));
+                        String id = s.substring(s.indexOf("#id=") + 4, s.indexOf("#", s.indexOf("#id")+ 5) );
                         String sql = "select * from " + NetConf.questions_table + " where id=" + id;
                         ResultSet resultSet = sql_connection.sql_deal(sql);
                         if (resultSet.next()) {
@@ -78,7 +109,6 @@ public class QuestionDeal {
                     }
                     if (type == 1) {
                         String id = s.substring(s.indexOf("#id=") + 4, s.indexOf("#", s.indexOf("#id") + 5));
-
                         ResultSet resultSet = sql_connection.sql_deal("select * from " + NetConf.questions_table + " where id=" + id);
                         if (resultSet.next()) {
                             String data_ans = resultSet.getString("ans");
@@ -206,7 +236,6 @@ public class QuestionDeal {
                 }
             }
         } catch (SQLException throwables) {
-
             throwables.printStackTrace();
         }
         sql_connection.sql_end();
@@ -234,7 +263,6 @@ public class QuestionDeal {
                 }
             }
         } catch (SQLException throwables) {
-
             throwables.printStackTrace();
         }
         sql_connection.sql_end();

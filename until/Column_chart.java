@@ -6,7 +6,12 @@ import java.awt.*;
 public class Column_chart extends JFrame {
     private String[] x_arr;
     private int[] y_arr;
-
+    int left_margin = 80;//不少于40
+    int top_margin = 80;//不少于80
+    int y_length = 450;
+    int x_length = 450;
+    int y_divisor = 20;
+    int x_divisor = x_arr.length + 1;
     //绘制柱形统计图
     class V {
         int x, y;
@@ -17,10 +22,12 @@ public class Column_chart extends JFrame {
         }
     }
 
-    public Column_chart() {
+    public Column_chart(String[] strings,int[] ints) {
         super();
         x_arr = new String[]{"100-90", "89-70", "79-70", "69-60", "60-"};
-        y_arr = new int[]{50, 12, 31, 16, 15};
+        x_arr=strings;
+        y_arr=ints;
+        x_divisor = x_arr.length + 1;
         setTitle("成绩分析图");
         setBounds(100, 100, 600, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,12 +38,7 @@ public class Column_chart extends JFrame {
     public void paint(Graphics g) {
         int Width = getWidth();
         int Height = getHeight();
-        int left_margin = 80;//不少于40
-        int top_margin = 80;//不少于80
-        int y_length = 450;
-        int x_length = 450;
-        int y_divisor = 20;
-        int x_divisor = x_arr.length + 1;
+
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

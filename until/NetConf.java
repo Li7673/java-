@@ -11,5 +11,6 @@ public class NetConf {
     public static final  String getDatabase_driverClassName="com.mysql.cj.jdbc.Driver";
     public static final  String questions_table="questions";
     public static final  String paper_table="papers";
+    public static final  String account_table="account";
 }
 

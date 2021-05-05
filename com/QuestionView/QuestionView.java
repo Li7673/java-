@@ -4,6 +4,7 @@ import com.Components.Blank_Question;
 import com.Components.JPanel_shadowText;
 import com.Components.Question;
 import com.Components.RButton;
+import until.Column_chart;
 import until.QuestionDeal;
 
 import javax.imageio.ImageIO;
@@ -23,6 +24,7 @@ public class QuestionView extends JFrame {
     public int height, width;
     public JPanel jp_questions;
     public Vector<Question> questions;
+    public Vector<Question_show_box> question_show_boxes=new Vector<>();
     public void  update_jp_question(){
         jp_questions.removeAll();
         jp_questions.setBorder(null);
@@ -31,6 +33,7 @@ public class QuestionView extends JFrame {
             questionShowBox.setQuestionView(this);
             questionShowBox.setSize(1100, 100);
             jp_questions.add(questionShowBox);
+            question_show_boxes.add(questionShowBox);
 
         });
         jp_questions.repaint();
@@ -117,6 +120,29 @@ public class QuestionView extends JFrame {
         JButton jb_add = new RButton("增加题目");
         JButton jb_new_a_paper = new RButton("自动组卷");
         JButton jb_sum = new RButton("提交试卷");
+        JButton jb_sortByType=new RButton("按类型统计");
+        JButton jb_sortByDifficulty=new RButton("按难度统计");
+        jb_sortByType.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                String[] strings={"单选题","多选题","主观题"};
+                int[] ints=new int[3];
+                //待修改
+                ints[0]=QuestionDeal.countQuestion(0);
+                ints[1]=QuestionDeal.countQuestion(1);
+                ints[2]=QuestionDeal.countQuestion(2);
+                Column_chart column_chart=new Column_chart(strings,ints);
+            }
+        });
+        jb_sortByDifficulty.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                String[]strings={"1","2","3","4","5","6","7","8","9","10"};
+                for (int i=0;i<10;i++){
+
+                }
+            }
+        });
 
 
         jb_add.setPreferredSize(new Dimension(210, 50));
@@ -157,6 +183,11 @@ public class QuestionView extends JFrame {
 
     private void QuestionSort() {
          jp_questions.removeAll();
+
+         if(questions!=null){
+             questions.sort(Question::compareTo);
+             update_jp_question();
+         }
 
     }
 

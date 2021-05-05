@@ -119,7 +119,7 @@ public class SignView extends JFrame {
         this.setVisible(true);
 
     }
-    private  void sign( ){
+    private  void sign(){
 
     }
     public RButton getLogin_btn() {

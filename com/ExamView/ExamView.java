@@ -31,6 +31,10 @@ public class ExamView extends JFrame {
     JLabel jl_question;
     public int question_number = 50;
     public int current_question_id;
+
+    private void  ans_id_to_true_id(){
+
+    }
     public void  summit() {
         try {
             Socket socket;

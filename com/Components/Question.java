@@ -2,7 +2,7 @@ package com.Components;
 
 import java.io.Serializable;
 
-public  class  Question  implements Serializable {
+public  class  Question  implements Comparable<Question>{
 
     protected String description;
     protected int  id,type,difficulty;
@@ -24,8 +24,13 @@ public  class  Question  implements Serializable {
     }
     public Question setType(int type) {
         this.type = type;
+         return null;
+    }
 
-        return null;
+    @Override
+    public int compareTo(Question question) {
+
+        return this.difficulty-question.difficulty;
     }
 
     public void setRight_ans(String right_ans) {
