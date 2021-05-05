@@ -1,6 +1,9 @@
 package com.Components;
 
-public  class  Question {
+import java.io.Serializable;
+
+public  class  Question  implements Serializable {
+
     protected String description;
     protected int  id,type,difficulty;
     public String right_ans;
@@ -23,6 +26,21 @@ public  class  Question {
         this.type = type;
 
         return null;
+    }
+
+    public void setRight_ans(String right_ans) {
+        this.right_ans = right_ans;
+    }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "description='" + description + '\'' +
+                ", id=" + id +
+                ", type=" + type +
+                ", difficulty=" + difficulty +
+                ", right_ans='" + right_ans + '\'' +
+                '}';
     }
 
     public int getDifficulty() {

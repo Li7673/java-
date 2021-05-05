@@ -11,8 +11,8 @@ public class StudentIndex extends JFrame {
     public static int screen_height = Toolkit.getDefaultToolkit().getScreenSize().height;
     public static int screen_width = Toolkit.getDefaultToolkit().getScreenSize().width;
     public int height, width;
-
-    public StudentIndex() {
+    private String id,class_id;
+    public StudentIndex(String id,String class_id ) {
         height = 500;
         width = 600;
         this.setTitle("学生主页");
@@ -23,7 +23,7 @@ public class StudentIndex extends JFrame {
         bg.setLocation(0, 0);
         this.add(bg);
         setLayout(null);
-        JLabel jl_information = new JLabel("姓名：" + "    班级：" + "    账号：");
+        JLabel jl_information = new JLabel( "班级："+ class_id+ "    账号："+id);
         jl_information.setFont(new Font("华文楷体", 1, 30));
         jl_information.setSize(500, 100);
         jl_information.setLocation(50, 50);

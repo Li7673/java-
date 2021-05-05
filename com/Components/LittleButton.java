@@ -15,9 +15,50 @@ public class LittleButton extends JButton {
     public   Color BUTTON_FOREGROUND_COLOR = Color.WHITE;
     int choice=0;//0 未选中，1选中未点击，2点中
     String name;
+    public int id;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public LittleButton(String name,int id){
+        super(name);
+        this.id=id;
+        this.name=name;
+        this.hover=false;
+        setForeground(Color.white);
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setContentAreaFilled(false);
+        setPreferredSize(new Dimension(50,50));
+        setBackground(BUTTON_COLOR1);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public  void mouseClicked(MouseEvent e){
+//                if(choice!=2) choice=2;
+//                else choice=1;
+//                repaint();
+            }
+            public void mouseEntered(MouseEvent e) {
+                if (choice!=2)choice=1;
+                repaint();
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (choice!=2)choice=0;
+                repaint();
+            }
+        });
+    }
     public LittleButton(String name){
         super(name);
+        this.id=id;
         this.name=name;
         this.hover=false;
         setForeground(Color.white);

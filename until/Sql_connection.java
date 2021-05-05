@@ -19,6 +19,12 @@ public class Sql_connection {
             throwables.printStackTrace();
         }
     }
+   public boolean sql_dealCh(String sql) throws SQLException{
+
+           return  statement.execute(sql);
+
+   }
+
     public ResultSet sql_deal(String sql) throws SQLException{
         return statement.executeQuery(sql);
     }
