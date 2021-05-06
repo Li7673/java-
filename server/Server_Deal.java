@@ -6,7 +6,7 @@ import until.QuestionDeal;
 import until.Sql_connection;
 import until.StringDeal;
 
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,14 +17,33 @@ public class Server_Deal extends Thread{
         public int  server_type;
         public  String out;
         private Socket socket;
-       public Server_Deal(String s , Socket socket) {
+        private  BufferedReader br;
+        private BufferedWriter bw;
+        private PrintWriter pw;
+       public Server_Deal( Socket socket) {
+           System.out.println("socket传入");
            this.socket=socket;
-           this.server_type=Integer.parseInt(s.substring(s.indexOf("#code="),s.indexOf("#",s.indexOf( "#code="))));
+           try {
+               br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+//输出流，向客户端写信息
+               bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+               pw = new PrintWriter(bw, true);
+               this.start();
+           }catch (IOException e){
+               e.printStackTrace();
+
+           }
         }
-        public  void  Run(){
-
-            switch (server_type) {
+         @Override
+        public  void  run(){
+            System.out.println("进入run");
+            try {
+                String read=null;
+                while ((read= br.readLine())!=null){
+                    System.out.println(read);
+                    server_type=Integer.parseInt( StringDeal.queryString(read,"#code="));
+                switch (server_type) {
                 case 0: {
 
                 }
@@ -32,10 +51,22 @@ public class Server_Deal extends Thread{
 
                 }
                 case 2:{
-
+                pw.println(login_deal(read));
             }
+                }
 
-        }
+        }}catch (IOException e){
+                e.printStackTrace();}
+        finally {
+                try {
+                    bw.close();
+                    pw.close();
+                    br.close();
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
     }
     //登陆状态码,0,1,2分别表示成功，无此账户，密码错误
