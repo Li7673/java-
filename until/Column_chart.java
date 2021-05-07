@@ -11,7 +11,7 @@ public class Column_chart extends JFrame {
     int y_length = 450;
     int x_length = 450;
     int y_divisor = 20;
-    int x_divisor = x_arr.length + 1;
+    int x_divisor;
     //绘制柱形统计图
     class V {
         int x, y;
@@ -28,9 +28,8 @@ public class Column_chart extends JFrame {
         x_arr=strings;
         y_arr=ints;
         x_divisor = x_arr.length + 1;
-        setTitle("成绩分析图");
+
         setBounds(100, 100, 600, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
     }
 

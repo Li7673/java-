@@ -22,11 +22,12 @@ public class ServerMain {
 //        System.out.println("主机地址："+ ia.getHostAddress()); //得到主机地址
 //
 //
-
+        serverSocket = new ServerSocket(NetConf.port);
         Socket socket=null;
-        while(true){
             try {
-                serverSocket = new ServerSocket(NetConf.port);
+                while(true){
+
+
                 System.out.println("socket建立完成");
                 socket = serverSocket.accept(); //等待并取出用户连接，并创建套接字
                 System.out.println("socket收到消息");
@@ -46,18 +47,18 @@ public class ServerMain {
 //                        break;
 //                    }
 //                }
-//            } //如果客户端断开连接，则应捕获该异常，但不应中断整个while循环，使得服务器能继续与其他客户端通信
-            }catch (IOException e) {e.printStackTrace();}finally{
-                if(null!=socket){try {socket.close(); //断开连接
+            } //如果客户端断开连接，则应捕获该异常，但不应中断整个while循环，使得服务器能继续与其他客户端通信
 
+            }catch (IOException e) {e.printStackTrace();}finally{
+
+                if(null!=socket){try {socket.close(); //断开连接
                 } catch (IOException e) {e.printStackTrace();}}
                 serverSocket.close();
+
             }
         }
 
 
-
-    }
 
 
 }

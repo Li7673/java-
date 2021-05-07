@@ -1,6 +1,8 @@
 package server;
 
+import com.Components.Ans;
 import com.Components.RButton;
+import com.mysql.cj.x.protobuf.MysqlxDatatypes;
 import until.NetConf;
 import until.QuestionDeal;
 import until.Sql_connection;
@@ -8,9 +10,9 @@ import until.StringDeal;
 
 import java.io.*;
 import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Date;
+import java.util.Vector;
 
 public class Server_Deal extends Thread{
         //用于处理字符串
@@ -31,6 +33,7 @@ public class Server_Deal extends Thread{
                pw = new PrintWriter(bw, true);
                this.start();
            }catch (IOException e){
+
                e.printStackTrace();
 
            }
@@ -38,37 +41,49 @@ public class Server_Deal extends Thread{
          @Override
         public  void  run(){
             System.out.println("进入run");
-            try {
-                String read=null;
-                while ((read= br.readLine())!=null){
+             try {
+                String read=br.readLine();
+                {
                     System.out.println(read);
                     server_type=Integer.parseInt( StringDeal.queryString(read,"#code="));
                 switch (server_type) {
                 case 0: {
-
+                    pw.println(login_deal(read));break;
                 }
                 case 1:{
-
+                   pw.println(sign_deal(read));break;
                 }
                 case 2:{
-                pw.println(login_deal(read));
-            }
+                 pw.println(getPapers_Deal());break;
+                }
+                //3获得卷头
+                case 3:{
+                                 break;
+                    }
+                 //4获得卷体
+                    case 4:{
+
+                    }
+                    //5是试卷提交
+                    case 5:{
+
+                    }
+                    case 6:{
+
+                    }
                 }
 
         }}catch (IOException e){
-                e.printStackTrace();}
-        finally {
-                try {
-                    bw.close();
-                    pw.close();
-                    br.close();
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
 
-    }
+                e.printStackTrace();}
+           finally {
+                 try { socket.close();
+                 } catch(IOException e) {
+                     System.err.println("Socket not closed");
+                 }
+             }
+
+         }
     //登陆状态码,0,1,2分别表示成功，无此账户，密码错误
     public  static String  login_deal(String s){
           String result="err";
@@ -79,14 +94,17 @@ public class Server_Deal extends Thread{
         try {
             ResultSet resultSet=sql_connection.sql_deal(sql);
             if(resultSet.next()){
-              if(  resultSet.getString("password").equals(StringDeal.queryString(s,"#password="))){
-                  int i=Integer.valueOf(  resultSet.getString("is_teacher"));
+                int i=Integer.valueOf(  resultSet.getString("is_teacher"));
+                String password=resultSet.getString("password");
+                String classname= resultSet.getString("class_name");
+              if(  password.equals(StringDeal.queryString(s,"#password="))){
+
                   Date date=new Date();
                   String token=s+date.toString();
                   token=String.valueOf( token.hashCode());
                   String sql2="update "+NetConf.account_table+" set token= "+token+" where user_id= "+StringDeal.queryString(s,"#user_id=");
                   sql_connection.sql_dealCh(sql2);
-                  result= "~#state=0"+"~#is_teacher="+i+"#token="+token+"#";
+                  result= "~#state=0"+"~#is_teacher="+i+"#token="+token+"#class_name="+classname+"#";
               }
               else result= "~#state=2";
             }
@@ -205,12 +223,77 @@ public class Server_Deal extends Thread{
        sql_connection.sql_end();
        return result;
    }
-   public static void summit_Ans(String s){
+   //核心将卷子题目Id转为试卷ids;
+    public static int summit_Ans(String s){
+       Sql_connection sql_connection=new Sql_connection();
+       sql_connection.sql_start();
+       String s3="";
+       String paper_id=StringDeal.queryString(s,"#paper_id=");
+       String user_id=StringDeal.queryString(s,"#user_id=");
+       String sql="select * from "+NetConf.paper_table+" where paper_id="+paper_id;
+       int count=0;
+       try {
+           ResultSet resultSet=sql_connection.sql_deal(sql);
+           int []ids=new int[1000];
 
+           if(resultSet.next()) {
+               String questions_id=resultSet.getString("questions");
+               String choice_grade=resultSet.getString("choice_grade");
+               String blank_grade=resultSet.getString("blank_grade");
+               String [] arr_s =questions_id.split("#");
+               int i=0;
+               for ( String  ss :arr_s){
+                   if(!ss.equals("")){
+                       ids[i++]=Integer.parseInt(ss);
+                   }
+               }
+               i=0;
+
+            String[] s_ans=s.split("~");
+               for (String s2:s_ans ) {
+                   if(!s2.equals("")&&s2.indexOf("#id=")!=-1){
+                       s2=s2.replace("#id="+i,"#id="+ids[i]);
+                       i++;
+                       s3+="~"+s2+"#";
+                   }
+               }
+                count=QuestionDeal.choiceQuestionCheck(s3);
+            String sql3="Insert into "+NetConf.paper_ans_table+ " (`paper_id`, `stu_id`, `ans`, `choice_grade`)"
+                    +" values ( '"+ paper_id+"' ,'"+user_id+"','"+s3+"','"+Integer.parseInt(choice_grade)*count+" ')";
+               sql_connection.sql_dealCh(sql3);
+           }
+       } catch (SQLException throwables) {
+           throwables.printStackTrace();
+       }
+     return count;
+   }
+   public static void summit_paper(String s){
+       Sql_connection sql_connection=new Sql_connection();
+       sql_connection.sql_start();
+
+       String questions=StringDeal.queryString(s,"#questions_id=");
+       String time=StringDeal.queryString(s,"#time=");
+       String choice=StringDeal.queryString(s,"#choice_grade=");
+       String blank=StringDeal.queryString(s,"#blank_grade=");
+       String num=StringDeal.queryString(s,"#num=");
+       String sql="Insert into "+NetConf.paper_table+" ( `questions`, `name`, `time`, `number`, `choice_grade`, `blank_grade` ) "
+               +" values ( '"+questions+"','"+StringDeal.queryString(s,"#name=")+"','"+time+"','"+num+"','"+choice+"','"+blank+" ) ";
+       try {
+           sql_connection.sql_dealCh(sql);
+       } catch (SQLException throwables) {
+           throwables.printStackTrace();
+       }
+       sql_connection.sql_end();
    }
 
+//   public  static  String request_questions(){
+//
+//   }
 
-}
+
+    }
+
+
 
 
 

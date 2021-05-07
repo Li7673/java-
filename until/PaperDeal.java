@@ -19,6 +19,7 @@ public class PaperDeal {
                 S_paper="~#name="+resultSet.getString("name")+"#number="+resultSet.getString("number")
                         + "#quesiton_id="+resultSet.getString("questions")
                         +"#";
+
         }} catch (SQLException throwables) {
             throwables.printStackTrace();
         }

@@ -25,6 +25,45 @@ public class QuestionView extends JFrame {
     public JPanel jp_questions;
     public Vector<Question> questions;
     public Vector<Question_show_box> question_show_boxes=new Vector<>();
+    public String s_questions="";
+    public String paper_head;
+    //传入形如"#1#2"字符串
+    private void  update_question_show_paper(String s){
+        jp_questions.removeAll();
+        jp_questions.setBorder(null);
+
+        questions.forEach(question -> {
+            String ss="#"+question.getId();
+
+            Question_show_box questionShowBox = new Question_show_box(question);
+            questionShowBox.setQuestionView(this);
+            if(s.indexOf(ss)!=-1){
+                questionShowBox.setIs_selected(true);
+            }
+            questionShowBox.setSize(1100, 100);
+            jp_questions.add(questionShowBox);
+            question_show_boxes.add(questionShowBox);
+
+        });
+        jp_questions.repaint();
+    }
+
+    public String getPaper_head() {
+        return paper_head;
+    }
+
+    public void setPaper_head(String paper_head) {
+        this.paper_head = paper_head;
+    }
+
+    public void setS_questions(String s){
+        this.s_questions=s;
+    }
+
+    public String getS_questions() {
+        return s_questions;
+    }
+
     public void  update_jp_question(){
         jp_questions.removeAll();
         jp_questions.setBorder(null);
@@ -122,6 +161,21 @@ public class QuestionView extends JFrame {
         JButton jb_sum = new RButton("提交试卷");
         JButton jb_sortByType=new RButton("按类型统计");
         JButton jb_sortByDifficulty=new RButton("按难度统计");
+        JButton jb_setPaperHead=new RButton("设计表头");
+
+        jb_setPaperHead.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new PaperView1(self);
+            }
+        });
+
+        jb_new_a_paper.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                PaperView paperView=new PaperView(self);
+            }
+        });
         jb_sortByType.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -138,15 +192,21 @@ public class QuestionView extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String[]strings={"1","2","3","4","5","6","7","8","9","10"};
+                int[] ins=new int[10];
                 for (int i=0;i<10;i++){
-
+                  ins[i]=QuestionDeal.countQuestionByDifficulty(i);
                 }
+                Column_chart column_chart=new Column_chart(strings,ins);
             }
         });
 
 
         jb_add.setPreferredSize(new Dimension(210, 50));
         jb_new_a_paper.setPreferredSize(new Dimension(210, 50));
+        jb_setPaperHead.setPreferredSize(new Dimension(210, 50));
+        jb_sortByDifficulty.setPreferredSize(new Dimension(210, 50));
+        jb_sortByType.setPreferredSize(new Dimension(210, 50));
+        jb_sum.setPreferredSize(new Dimension(210, 50));
         jb_add.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -158,7 +218,11 @@ public class QuestionView extends JFrame {
         jp_side.setLocation(20, 100);
         jp_side.add(jl_side_top);
         jp_side.add(jb_add);
+        jp_side.add(jb_sortByType);
+        jp_side.add(jb_sortByDifficulty);
+        jp_side.add(jb_setPaperHead);
         jp_side.add(jb_new_a_paper);
+        jp_side.add(jb_sum);
         jp_side.setBackground(Color.white);
 
 
@@ -208,6 +272,7 @@ public class QuestionView extends JFrame {
 }
 class Question_show_box extends JPanel {
     int id;
+    Question_show_box self = this;
     JLabel jl_id, jl_description, jl_type, jl_difficulty;
     JPanel jp_button_box;
     boolean is_selected;
@@ -219,14 +284,38 @@ class Question_show_box extends JPanel {
 
     public void setIs_selected(boolean is_selected) {
         this.is_selected = is_selected;
+        if(is_selected)
+        {
+            self.setBackground(new Color(0x30ACF8));
+            addThisQuestion();
+
+        }
+        else {
+            self.setBackground(Color.white);
+            removeThisQuestion();
+        }
     }
 
     public void setQuestionView(QuestionView questionView) {
         this.questionView = questionView;
     }
+    public void addThisQuestion(){
+        String s=questionView.getS_questions();
+        if(s.indexOf("#"+id)==-1){
+        questionView.setS_questions(s+"#"+id);
+        }
 
+    }
+    public void removeThisQuestion(){
+        String s=questionView.getS_questions();
+        if(s.indexOf("#"+id)!=-1){
+            questionView.setS_questions(s.replace("#"+id,""));
+        }
+        System.out.println(questionView.getS_questions());
+    }
     public Question_show_box(Question question) {
-        Question_show_box self = this;
+        this.id=question.getId();
+
         Border border = BorderFactory.createLineBorder(new Color(0x039AD6), 2);
         this.setBorder(border);
         this.setLayout(null);
@@ -255,7 +344,6 @@ class Question_show_box extends JPanel {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                      self.setVisible(false);
-
                     }
                 }
         );
@@ -305,9 +393,15 @@ class Question_show_box extends JPanel {
             public  void mouseClicked(MouseEvent e){
                 is_selected=!is_selected;
                 if(is_selected)
+                {
                     self.setBackground(new Color(0x30ACF8));
-                else self.setBackground(Color.white);
+                    addThisQuestion();
 
+                }
+                else {
+                    self.setBackground(Color.white);
+                    removeThisQuestion();
+                }
 
             }
             @Override

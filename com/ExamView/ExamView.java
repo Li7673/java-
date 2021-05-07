@@ -31,9 +31,59 @@ public class ExamView extends JFrame {
     JLabel jl_question;
     public int question_number = 50;
     public int current_question_id;
+    private String user_id;
+    private int paper_id;
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+    public void setPaper_id(int paper_id) {
+        this.paper_id = paper_id;
+    }
+    class RTimer extends Thread {
+        int min, second;
+        JLabel jl;
+        String text;
+        public RTimer(JLabel jl, int Minutes, int Second, String text) {
+            min = Minutes;
+            second = Second;
+            this.jl = jl;
+            this.text = text;
+            jl.setText(text + String.valueOf(min) + ":" + String.valueOf(second));
+        }
 
-    private void  ans_id_to_true_id(){
+        public void run() {
+            while (true)
+                if (min >= 0) {
+                    if (min < 1) {
+                        jl.setForeground(Color.RED);
+                    }
+                    if (second > 0) {
+                        try {
+                            sleep(1000);
+                            second--;
+                            jl.setText(text + min + ":" + second);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else if (second == 0) {
+                        try {
+                            sleep(1000);
+                            if (min > 0)
+                                min--;
+                            second = 59;
+                            jl.setText(text + min + ":" + second);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        jl.setText(text + min + ":" + second);
+                    }
+                    if (min == 0 && second == 0) {
+                        summit();
 
+                        break;
+                    }
+                }
+        }
     }
     public void  summit() {
         try {
@@ -45,13 +95,50 @@ public class ExamView extends JFrame {
             //客户端输入流，接收服务器消息
             BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter pw = new PrintWriter(bw, true);
+            String paper= "#code=5#paper_id="+paper_id+"#user_id=#"+user_id+ QuestionDeal.toAnsString(arr_ans);
+            pw.println(paper);
+            String read=br.readLine();
+            if(read!=null||!read.equals("")) {
+
+                JOptionPane.showMessageDialog(null, "提交成功");
+                this.setVisible(false);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void getPaperHead(){
+        try {
+            Socket socket;
+            //客户端输出流，向服务器发消息
+            socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
+
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            //客户端输入流，接收服务器消息
+            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter pw = new PrintWriter(bw, true);
+            String paper= "#code=3#paper_id="+paper_id;
+            pw.println(paper);
+            String read=br.readLine();
+            if(read!=null||!read.equals("")) {
+
+                JOptionPane.showMessageDialog(null, "提交成功");
+                this.setVisible(false);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public ExamView() {
-        super();
+    public ExamView(int paper_id,String user_id){
+        this.paper_id=paper_id;
+        this.user_id=user_id;
+
+        init();
+    }
+
+    public void init() {
+
         JFrame self = this;
         Container jp = this.getContentPane();
         jp.setLayout(null);
@@ -94,6 +181,8 @@ public class ExamView extends JFrame {
         questions.get(1).setId(1);
         questions.get(2).setId(2);
         System.out.println(questions.get(2).getType());
+
+
 
         initQuestionArea(1);
         jp_question_area.repaint();
@@ -582,48 +671,4 @@ class Blank_QuestionBox extends JPanel {
     }
 }
 
-class RTimer extends Thread {
-    int min, second;
-    JLabel jl;
-    String text;
 
-    public RTimer(JLabel jl, int Minutes, int Second, String text) {
-        min = Minutes;
-        second = Second;
-        this.jl = jl;
-        this.text = text;
-        jl.setText(text + String.valueOf(min) + ":" + String.valueOf(second));
-    }
-
-    public void run() {
-        while (true)
-            if (min >= 0) {
-                if (min < 1) {
-                    jl.setForeground(Color.RED);
-                }
-                if (second > 0) {
-                    try {
-                        sleep(1000);
-                        second--;
-                        jl.setText(text + min + ":" + second);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } else if (second == 0) {
-                    try {
-                        sleep(1000);
-                        if (min > 0)
-                            min--;
-                        second = 59;
-                        jl.setText(text + min + ":" + second);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    jl.setText(text + min + ":" + second);
-                }
-                if (min == 0 && second == 0) {
-                    break;
-                }
-            }
-    }
-}

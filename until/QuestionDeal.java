@@ -9,6 +9,22 @@ import java.util.Vector;
 
 public class QuestionDeal {
 
+    public  static  void changeQuestion(String s){
+        Sql_connection sql_connection=new Sql_connection();
+        sql_connection.sql_start();
+
+        String sql="update "+NetConf.questions_table+" set "+" `description`='"+StringDeal.queryString(s,"#description=")
+                +  "', `ans`='"+StringDeal.queryString(s,"#ans=")
+                +"', `difficulty`='"+StringDeal.queryString(s,"#difficulty=")+"' where id="+StringDeal.queryString(s,"#id=") ;
+        try {
+          sql_connection.sql_dealCh(sql);
+          sql_connection.sql_end();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+
     public  static  int countQuestion(int type){
         Sql_connection sql_connection=new Sql_connection();
         sql_connection.sql_start();
@@ -25,6 +41,7 @@ public class QuestionDeal {
         }
          return count;
     }
+
     public static int countQuestionByDifficulty(int di){
         Sql_connection sql_connection=new Sql_connection();
         sql_connection.sql_start();
@@ -44,7 +61,7 @@ public class QuestionDeal {
     public static String toAnsString(Vector<Ans> ansVector) {
         String s_ans = "";
         for (Ans ans : ansVector)
-            s_ans += "~#type=" + ans.getType() + "#id=" + ans.getQuestion_id() + "#ans=" + ans.getAns();
+            s_ans += "~#type=" + ans.getType() + "#id=" + ans.getQuestion_id() + "#ans=" + ans.getAns()+"#";
         s_ans += "#";
         return s_ans;
     }
@@ -231,7 +248,7 @@ public class QuestionDeal {
                 } else {
                     text = "~#id=" + database_id + "#type=" + type + "#description=" + set.getString("description")
                             + "#difficulty=" + set.getString("difficulty") +
-                            "#ans" + set.getString("ans")
+                            "#ans=" + set.getString("ans")
                             + "#";
                 }
             }
@@ -258,7 +275,7 @@ public class QuestionDeal {
                 } else {
                     text = "~#id=" + now_id + "#type=" + type + "#description=" + set.getString("description")
                             + "#difficulty=" + set.getString("difficulty") +
-                            "#ans" + set.getString("ans")
+                            "#ans=" + set.getString("ans")
                             + "#";
                 }
             }

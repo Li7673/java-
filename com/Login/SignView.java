@@ -3,12 +3,15 @@ package com.Login;
 import com.Components.RButton;
 import com.Components.RPasswordField;
 import com.Components.RTextField;
+import until.ClientConf;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.*;
+import java.net.Socket;
 
 public class SignView extends JFrame {
     public static int screen_height= Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -97,10 +100,17 @@ public class SignView extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
 
-                if(!jt_repassord.getPassword().equals(jt_password))
+                if(!new String((jt_repassord.getPassword())).equals(new String(jt_repassord.getPassword())))
                     jl_warning.setText("两次密码需要相同");
+                else
                 if(jt_password.getPassword().length<8||jt_password.getPassword().length>20){
                     jl_warning.setText("密码长度应该在8到20位");
+                }else {
+                    try {
+                        sign_sum();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
                 }
             }
         });
@@ -119,8 +129,28 @@ public class SignView extends JFrame {
         this.setVisible(true);
 
     }
-    private  void sign(){
+    private  void sign_sum() throws IOException{
+        Socket socket;
+        //客户端输出流，向服务器发消息
+        socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        //客户端输入流，接收服务器消息
+        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter pw = new PrintWriter(bw, true); //装饰输出流，及时刷
+        String msg ="~#code=1#user_id="+jt_user_ID.getText()+"#password="+ new String(jt_password.getPassword())
+                +"#class_name="+jt_class_name.getText()+"#is_teacher="+
+                (jc_identity.getSelectedItem().toString().equals("学生")?0:1)+"#";
 
+        pw.println(msg); //发送给服务器端
+        //输出服务器返回的消息
+        String s=br.readLine();
+        System.out.println(s);
+        if(s.indexOf("注册成功")!=-1)
+            JOptionPane.showMessageDialog(null,"注册成功");
+        else JOptionPane.showMessageDialog(null,s);
+        br.close();
+        pw.close();
+        socket.close();
     }
     public RButton getLogin_btn() {
         return login_btn;

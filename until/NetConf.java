@@ -12,5 +12,6 @@ public class NetConf {
     public static final  String questions_table="questions";
     public static final  String paper_table="papers";
     public static final  String account_table="account";
+    public static final  String paper_ans_table="paper_ans";
 }
 
