@@ -76,12 +76,12 @@ public class StudentIndex extends JFrame {
         BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter pw = new PrintWriter(bw, true); //装饰输出流，及时刷
         String msg ="~#code=2#";
-
         pw.println(msg); //发送给服务器端
         //输出服务器返回的消息
         String s1=br.readLine();
         System.out.println(s1);
         String[] strings=s1.split("~");
+        socket.close();
         return  strings;
     }
 

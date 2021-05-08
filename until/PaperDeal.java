@@ -4,6 +4,7 @@ import com.Components.Paper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class PaperDeal {
     public static String getPaperFromDataBase (int id) {
@@ -27,9 +28,33 @@ public class PaperDeal {
     sql_connection.sql_end();
     return S_paper;
     }
-//    public  static Paper toPaper(String text){
-//        String name=text.substring(text.indexOf("#"))
-//        Paper paper=new Paper();
-//
-//    }
+   public static String automaticCreatePaper(int diff,int num){
+       Sql_connection sql_connection=new Sql_connection();
+       sql_connection.sql_start();
+       int i=0;
+       int dif=diff;
+       String string="";
+       String result="";
+       boolean is=false;
+       try {
+           do {
+               String sql = "select * from " + NetConf.questions_table + " where difficulty=" + dif;
+               ResultSet resultSet = sql_connection.sql_deal(sql);
+               while (resultSet.next()) {
+                   result += "#" + resultSet.getString("id");
+                   i++;
+                   if (i == num) break;
+               }
+               if(dif>2) {
+                   dif--;
+               }
+               if(dif==1) is=true;
+               if(is) break;
+           }while (i<num);
+       } catch (SQLException throwables) {
+           throwables.printStackTrace();
+       }
+       return result;
+   }
+
 }

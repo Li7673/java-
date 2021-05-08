@@ -4,6 +4,7 @@ import com.Components.Blank_Question;
 import com.Components.JPanel_shadowText;
 import com.Components.Question;
 import com.Components.RButton;
+import until.ClientConf;
 import until.Column_chart;
 import until.QuestionDeal;
 
@@ -14,8 +15,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.Socket;
 import java.util.Vector;
 
 public class QuestionView extends JFrame {
@@ -28,17 +29,18 @@ public class QuestionView extends JFrame {
     public String s_questions="";
     public String paper_head;
     //传入形如"#1#2"字符串
-    private void  update_question_show_paper(String s){
+
+    public void  update_question_show_paper(String s){
         jp_questions.removeAll();
         jp_questions.setBorder(null);
-
+         s_questions=s;
         questions.forEach(question -> {
             String ss="#"+question.getId();
-
             Question_show_box questionShowBox = new Question_show_box(question);
             questionShowBox.setQuestionView(this);
             if(s.indexOf(ss)!=-1){
                 questionShowBox.setIs_selected(true);
+
             }
             questionShowBox.setSize(1100, 100);
             jp_questions.add(questionShowBox);
@@ -86,7 +88,57 @@ public class QuestionView extends JFrame {
         jp_questions.repaint();
     }
 
-    public QuestionView() {
+    private void get_questions_from_server(){
+        Socket socket;
+        //客户端输出流，向服务器发消息
+
+        try {
+            socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        //客户端输入流，接收服务器消息
+        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter pw = new PrintWriter(bw, true);
+        String get="#code=6#";
+        pw.println(get);
+        String read=br.readLine();
+        questions=QuestionDeal.toQuestionVector(read);
+        socket.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    } }
+    private void summit(){
+        Socket socket;
+        //客户端输出流，向服务器发消息
+
+        try {
+            socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            //客户端输入流，接收服务器消息
+            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter pw = new PrintWriter(bw, true);
+            if(paper_head==null||paper_head.equals("")) {
+                JOptionPane.showMessageDialog(null, "请先填试卷表头");
+                socket.close();
+             return;
+            }
+            String get="#code=10#"+paper_head+"#questions_id="+s_questions+"￥";
+            System.out.println(get);
+            pw.println(get);
+            String read=br.readLine();
+            JOptionPane.showMessageDialog(null,"提交成功");
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public  QuestionView(){
+        get_questions_from_server();
+        init();
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    public void init() {
         this.height = 800;
         this.width = 1500;
         this.setLayout(null);
@@ -135,21 +187,8 @@ public class QuestionView extends JFrame {
 
 
         //测试数据
-        Blank_Question c = new Blank_Question("李志豪难到不是蠢货，弱智吗，不会吧？不会吧？ 李志豪今天必死 啊就哦跑j opj o jpjopjop", 5);
-        c.setDifficulty(1);
-        Question_show_box question_show_box = new Question_show_box(c);
-        String question1 = QuestionDeal.Question_DataBase_to_String(1);
-        String question2 = QuestionDeal.Question_DataBase_to_String(2);
-        String question3 = QuestionDeal.Question_DataBase_to_String(3);
-        String question4 = QuestionDeal.Question_DataBase_to_String(3);
-
-        questions = QuestionDeal.toQuestionVector(question1 + question2 + question3 + question4 + question1 + question1 + question1);
-        update_jp_question();
-
-
-
         //测试数据结束
-
+        update_jp_question();
 
         //side
         JPanel jp_side = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 30));
@@ -207,6 +246,12 @@ public class QuestionView extends JFrame {
         jb_sortByDifficulty.setPreferredSize(new Dimension(210, 50));
         jb_sortByType.setPreferredSize(new Dimension(210, 50));
         jb_sum.setPreferredSize(new Dimension(210, 50));
+        jb_sum.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                summit();
+            }
+        });
         jb_add.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -281,7 +326,24 @@ class Question_show_box extends JPanel {
     public boolean isIs_selected() {
         return is_selected;
     }
-
+    private void  delete(){
+        Socket socket;
+        //客户端输出流，向服务器发消息
+        try {
+            socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            //客户端输入流，接收服务器消息
+            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter pw = new PrintWriter(bw, true);
+            String get="#code=7#id="+id+"#";
+            pw.println(get);
+            String read=br.readLine();
+            System.out.println(read);
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void setIs_selected(boolean is_selected) {
         this.is_selected = is_selected;
         if(is_selected)
@@ -343,8 +405,10 @@ class Question_show_box extends JPanel {
                 new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                     self.setVisible(false);
-                    }
+                     if(JOptionPane.showConfirmDialog(null,"确定删除?","提示消息",JOptionPane.YES_NO_OPTION)==0) {
+                         delete();
+                         self.setVisible(false);
+                     }}
                 }
         );
 

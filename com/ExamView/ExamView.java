@@ -1,8 +1,10 @@
 package com.ExamView;
 
 import com.Components.*;
+import server.Server_Deal;
 import until.ClientConf;
 import until.QuestionDeal;
+import until.StringDeal;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +26,7 @@ public class ExamView extends JFrame {
     Vector<LittleButton> arr_blank_btn = new Vector<>();
     Vector<LittleButton> arr_choice_btn = new Vector<>();
     Vector<Ans> arr_ans = new Vector<>(50);
-    Vector<Question> questions = new Vector<>(50);
+    Vector<Question> questions ;
     JPanel jp_top;
     JPanel jp_sidebar;
     JPanel jp_question_area, jp_timer, jp_bottom;
@@ -33,6 +35,9 @@ public class ExamView extends JFrame {
     public int current_question_id;
     private String user_id;
     private int paper_id;
+    private String time,name;
+    RTimer timer;
+    private int min, second;
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
@@ -44,8 +49,8 @@ public class ExamView extends JFrame {
         JLabel jl;
         String text;
         public RTimer(JLabel jl, int Minutes, int Second, String text) {
-            min = Minutes;
-            second = Second;
+            this.min = Minutes;
+            this.second = Second;
             this.jl = jl;
             this.text = text;
             jl.setText(text + String.valueOf(min) + ":" + String.valueOf(second));
@@ -95,45 +100,106 @@ public class ExamView extends JFrame {
             //客户端输入流，接收服务器消息
             BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter pw = new PrintWriter(bw, true);
-            String paper= "#code=5#paper_id="+paper_id+"#user_id=#"+user_id+ QuestionDeal.toAnsString(arr_ans);
+            System.out.println(arr_ans);
+            String paper= "#code=5#paper_id="+paper_id+"#user_id="+user_id+"#"+ QuestionDeal.toAnsString(arr_ans);
             pw.println(paper);
             String read=br.readLine();
-            if(read!=null||!read.equals("")) {
 
-                JOptionPane.showMessageDialog(null, "提交成功");
+            if(read!=null||!read.equals("")) {
+                JOptionPane.showMessageDialog(null, "提交成功你客观题对了"+read);
                 this.setVisible(false);
             }
+            br.close();
+            bw.close();
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
     public void getPaperHead(){
         try {
             Socket socket;
             //客户端输出流，向服务器发消息
+            System.out.println(""+ClientConf.server_host+ClientConf.port);
             socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
-
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             //客户端输入流，接收服务器消息
             BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter pw = new PrintWriter(bw, true);
-            String paper= "#code=3#paper_id="+paper_id;
+            String paper= "#code=3#paper_id="+paper_id+"#";
             pw.println(paper);
             String read=br.readLine();
-            if(read!=null||!read.equals("")) {
+            if(read!=null){
+                time= StringDeal.queryString(read,"#time=");
+                name=StringDeal.queryString(read,"#name=");
+                int num=Integer.parseInt(StringDeal.queryString(read,"#number="));
 
-                JOptionPane.showMessageDialog(null, "提交成功");
-                this.setVisible(false);
+                System.out.println(arr_ans);
+                String[]strings= time.split(":");
+                int i=0 ,hour=0;
+                for (String s :
+                    strings ) {
+                    if(!s.equals("")){
+                       if(i==0) {
+                         hour=Integer.parseInt(s);
+                       }
+                       if(i==1){
+                           min=hour*60+Integer.parseInt(s);
+                       }
+                       if(i==2){
+                           second=Integer.parseInt(s);
+                       }
+                       i++;
+                    }
+                }
+                bw.close();
+              socket.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
-    public ExamView(int paper_id,String user_id){
+    public void getPaper_inner() {
+        try {
+            Socket socket;
+            //客户端输出流，向服务器发消息
+            socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            //客户端输入流，接收服务器消息
+            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter pw = new PrintWriter(bw, true);
+            String paper= "#code=4#paper_id="+paper_id+"#";
+            pw.println(paper);
+            String read=br.readLine();
+            System.out.println(read);
+            if(read!=null){
+               questions=QuestionDeal.toQuestionVector(read);
+
+               questions.forEach(question -> {
+                 Ans ans=new Ans(question.getId());
+                 ans.setType(question.getType());
+                 arr_ans.add(ans);
+               });
+
+            }
+                bw.close();
+                socket.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public ExamView(int paper_id, String user_id){
         this.paper_id=paper_id;
         this.user_id=user_id;
-
+        getPaperHead();
+        getPaper_inner();
+        System.out.println(questions);
         init();
     }
 
@@ -151,13 +217,13 @@ public class ExamView extends JFrame {
         jp_question_area = new BgPanel(new File("resource/moonbg.jpg"));
         jp_question_area.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 50));
         jp_sidebar = new JPanel();
-        jp_top = new JPanel_shadowText("JAVA考试答题界面");
+        jp_top = new JPanel_shadowText(name);
 
         jp_timer = new JPanel();
         jp_bottom = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 0));
         JLabel jl_timer = new JLabel();
         jl_timer.setFont(new Font("微软黑体", 1, 50));
-        RTimer timer = new RTimer(jl_timer, 1, 2, "剩余时间: ");
+        timer= new RTimer(jl_timer, min, second, "剩余时间: ");
         jp_timer.add(jl_timer);
         jp_top.setBackground(Color.white);
         //top
@@ -171,20 +237,7 @@ public class ExamView extends JFrame {
 
 
 
-
-
-        String question1 = QuestionDeal.Question_DataBase_to_String(1);
-        String question2 = QuestionDeal.Question_DataBase_to_String(2);
-        String question3 = QuestionDeal.Question_DataBase_to_String(3);
-        questions = QuestionDeal.toQuestionVector(question1 + question2 + question3);
-        questions.get(0).setId(0);
-        questions.get(1).setId(1);
-        questions.get(2).setId(2);
-        System.out.println(questions.get(2).getType());
-
-
-
-        initQuestionArea(1);
+        initQuestionArea(0);
         jp_question_area.repaint();
         jp_question_area.setSize(1200, 550);
         jp_question_area.setLocation(0, 200);
@@ -205,6 +258,13 @@ public class ExamView extends JFrame {
         jl_mutiple.setPreferredSize(new Dimension(400, 40));
         jl_choice.setPreferredSize(new Dimension(400, 40));
         RButton jb_submit = new RButton("提交试卷");
+
+        jb_submit.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                summit();
+            }
+        });
         jb_submit.setPreferredSize(new Dimension(315, 50));
 
 
@@ -511,13 +571,12 @@ class Multiple_ChoiceBox extends JPanel {
                         arr_ans.get(id).setAns(arr_ans.get(id).getAns().replace(b.getText(), ""));
                     } else {
                         b.setChoice(2);
-                        if (arr_ans.get(id).getAns() == null || arr_ans.get(id).getAns().equals("")) {
-                            arr_ans.add(id, new Ans(b.getText(), id, 1));
+//                        if (arr_ans.get(id).getAns() == null ) {
+//                            arr_ans.add(id, new Ans(b.getText(), id, 1));
+//                        } else {
+                            arr_ans.get(id).setAns(b.getText() + "￥" + (arr_ans.get(id).getAns()==null?"":arr_ans.get(id).getAns()));
 
-                        } else {
-                            arr_ans.get(id).setAns(b.getText() + "￥" + arr_ans.get(id).getAns());
-
-                        }
+ //                       }
                     }
 
                 }
@@ -638,6 +697,7 @@ class Blank_QuestionBox extends JPanel {
         type = 2;
         description = question.getDescription();
         id = question.getId();
+
         current_ans = arr_ans.get(id);
         current_ans.setType(2);
         jl_question = new JLabel("<html><p>" + description + "</p></html>");

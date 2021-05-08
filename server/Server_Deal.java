@@ -1,12 +1,10 @@
 package server;
 
 import com.Components.Ans;
+import com.Components.Question;
 import com.Components.RButton;
 import com.mysql.cj.x.protobuf.MysqlxDatatypes;
-import until.NetConf;
-import until.QuestionDeal;
-import until.Sql_connection;
-import until.StringDeal;
+import until.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -58,17 +56,48 @@ public class Server_Deal extends Thread{
                 }
                 //3获得卷头
                 case 3:{
-                                 break;
+                  pw.println(getPaper_head(Integer.parseInt(StringDeal.queryString(read,"#paper_id="))));break;
                     }
                  //4获得卷体
                     case 4:{
-
+                  pw.println(getPaper_inner(Integer.parseInt(StringDeal.queryString(read,"#paper_id="))));break;
                     }
                     //5是试卷提交
                     case 5:{
-
+                  pw.println(summit_Ans(read));break;
                     }
+                    //获取题目
                     case 6:{
+                  pw.println(request_questions());break;
+                    }
+                    //删除题目
+                    case 7:{
+                   QuestionDeal.questionDelete(Integer.parseInt(StringDeal.queryString(read,"#id=")));
+                   pw.println("删除成功");break;
+                    }
+                    //增加题目
+                    case 8:{
+                        QuestionDeal.questionInsert(read);
+                        pw.println("提交成功");break;
+                    }
+                    //修改题目
+                    case 9:{
+                        QuestionDeal.changeQuestion(read);
+                        pw.println("修改成功");break;
+                    }
+                    //存储卷子
+                    case 10:{
+                        summit_paper(read);
+                        pw.println("提交成功");break;
+                    }
+                    //自动组卷的返回
+                    case 11:{
+                        int difficulty=Integer.parseInt( StringDeal.queryString(read,"#difficulty="));
+                        int num=Integer.parseInt(StringDeal.queryString(read,"#num="));
+                        pw.println(PaperDeal.automaticCreatePaper(difficulty,num));
+                    }
+                    //批阅试卷
+                    case 12:{
 
                     }
                 }
@@ -189,7 +218,6 @@ public class Server_Deal extends Thread{
            if (resultSet.next())
            {
                result="~#name="+resultSet.getString("name")+"#id="+resultSet.getString("paper_id")
-                       +"#questions="+resultSet.getString("questions")
                        +"#time="+resultSet.getString("time")+"#number="+resultSet.getString("number")+"#";
            }
        } catch (SQLException throwables) {
@@ -213,7 +241,7 @@ public class Server_Deal extends Thread{
                String[] strings=questions_id.split("#");
                for (String s:strings){
                    if (s!=null&&!s.equals("")) {
-                   result+=QuestionDeal.Question_DataBase_to_String(Integer.parseInt(s),i++);
+                   result+=QuestionDeal.Question_DataBase_to_String_exam(Integer.parseInt(s),i++);
                    }
                }
            }
@@ -257,6 +285,7 @@ public class Server_Deal extends Thread{
                        s3+="~"+s2+"#";
                    }
                }
+               System.out.println(s3);
                 count=QuestionDeal.choiceQuestionCheck(s3);
             String sql3="Insert into "+NetConf.paper_ans_table+ " (`paper_id`, `stu_id`, `ans`, `choice_grade`)"
                     +" values ( '"+ paper_id+"' ,'"+user_id+"','"+s3+"','"+Integer.parseInt(choice_grade)*count+" ')";
@@ -271,13 +300,21 @@ public class Server_Deal extends Thread{
        Sql_connection sql_connection=new Sql_connection();
        sql_connection.sql_start();
 
-       String questions=StringDeal.queryString(s,"#questions_id=");
+       String questions=s.substring(s.indexOf("#questions_id=")+14,s.indexOf("￥",s.indexOf("#questions_id=")+14));
+       String[]strings=questions.split("#");
+       int number=0;
+       for (String s1:strings
+            ) {
+           if(!s1.equals(""))
+               number++;
+       }
        String time=StringDeal.queryString(s,"#time=");
        String choice=StringDeal.queryString(s,"#choice_grade=");
        String blank=StringDeal.queryString(s,"#blank_grade=");
        String num=StringDeal.queryString(s,"#num=");
-       String sql="Insert into "+NetConf.paper_table+" ( `questions`, `name`, `time`, `number`, `choice_grade`, `blank_grade` ) "
-               +" values ( '"+questions+"','"+StringDeal.queryString(s,"#name=")+"','"+time+"','"+num+"','"+choice+"','"+blank+" ) ";
+       String sql="Insert into "+NetConf.paper_table+" ( `questions`, `name`, `time`,`number`,`choice_grade`, `blank_grade` ) "
+               +" values ( '"+questions+"','"+StringDeal.queryString(s,"#name=")+"','"+time+"','"+number+"','"+choice+"','"+blank+"' ) ";
+       System.out.println(sql);
        try {
            sql_connection.sql_dealCh(sql);
        } catch (SQLException throwables) {
@@ -286,9 +323,33 @@ public class Server_Deal extends Thread{
        sql_connection.sql_end();
    }
 
-//   public  static  String request_questions(){
-//
-//   }
+   public  static  String request_questions(){
+       Sql_connection sql_connection=new Sql_connection();
+       sql_connection.sql_start();
+       String result="";
+       String sql="select * from "+NetConf.questions_table;
+       try {
+           ResultSet set=sql_connection.sql_deal(sql);
+           while (set.next()){
+
+                   int type = Integer.parseInt(set.getString("type"));
+                   if (type == 0 || type == 1) {
+                       result += "~#id=" + set.getString("id") + "#type=" + type + "#description=" + set.getString("description")
+                               + "#difficulty=" + set.getString("difficulty") + "#choice_ans="
+                               + set.getString("ans").replace("@", "")
+                               + "#";
+                   } else {
+                       result += "~#id=" + set.getString("id") + "#type=" + type + "#description=" + set.getString("description")
+                               + "#difficulty=" + set.getString("difficulty") +
+                               "#ans=" + set.getString("ans")
+                               + "#";
+                   }
+           }
+       } catch (SQLException throwables) {
+           throwables.printStackTrace();
+       }
+       return result;
+   }
 
 
     }

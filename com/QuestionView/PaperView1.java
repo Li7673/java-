@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 public  class PaperView1 extends JFrame {
     JTextField jt_name,jt_num,jt_choice,jt_blank,jt_difficulty,jt_time;
     QuestionView fatherQuestionView;
+    JFrame self=this;
     public PaperView1(QuestionView questionView){
         setSize(550,700);
         this.fatherQuestionView=questionView;
@@ -78,7 +79,8 @@ public  class PaperView1 extends JFrame {
         sum.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+             summit();
+             self.dispose();
             }
         });
         add(sum);
@@ -100,7 +102,7 @@ public  class PaperView1 extends JFrame {
             JOptionPane.showMessageDialog(null,"请输入完整信息");
         }
        else {
-      fatherQuestionView.setPaper_head("~#name="+jt_name.getText()+"#time"+jt_time.getText()
+      fatherQuestionView.setPaper_head("~#name="+jt_name.getText()+"#time="+jt_time.getText()
               +"#choice_grade="+jt_choice.getText()+"#blank_grade="+jt_blank.getText());
             System.out.println(fatherQuestionView.getPaper_head());
     }}

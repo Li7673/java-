@@ -9,5 +9,14 @@ public class StringDeal {
        return  s.substring(init_index+l,s.indexOf("#",init_index+l+1) );
     }else return "";
     }
+   public  static int countString(String s,String t){
+        int count=0;
+        int location=0;
+        while (s.indexOf(t,location)!=-1){
+            location=s.indexOf(t,location)+t.length();
+            count++;
+        }
+    return count;
+    }
 
 }

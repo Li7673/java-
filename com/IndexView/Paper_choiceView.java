@@ -26,7 +26,7 @@ public class Paper_choiceView extends JFrame {
      jPanel.setBorder(border1);
 
      for(String s:strings){
-
+          if(!s.equals("")){
          RButton rButton=new RButton(StringDeal.queryString(s,"#name="));
          Font font=new Font("微软雅黑",0,50);
          rButton.setPreferredSize(new Dimension(350,100));
@@ -38,7 +38,7 @@ public class Paper_choiceView extends JFrame {
              }
          });
          jPanel.add(rButton);
-     }
+     }}
      jPanel.setPreferredSize(new Dimension(400, strings.length*150));
      jScrollPane.setLocation(40,100);
 

@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 public class Driver {
     public static Connection getConn() {
-        String driver = "com.mysql.jdbc.Driver";
-        String url = "jdbc:mysql://localhost:3306/studentandteacher?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+        String driver = "com.mysql.cj.jdbc.Driver";
+        String url=NetConf.database_url;
         String username = "root";
         Connection conn = null;
         try {

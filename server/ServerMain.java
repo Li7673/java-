@@ -17,17 +17,15 @@ public class ServerMain {
 
     static Connection con;
     public static <ClassReader> void main(String[] args) throws IOException {
-//        InetAddress ia=InetAddress.getLocalHost(); //获得本机IP地址情况
-//        System.out.println("主机名："+ ia.getHostName());  //得到主机名
-//        System.out.println("主机地址："+ ia.getHostAddress()); //得到主机地址
-//
-//
+        InetAddress ia=InetAddress.getLocalHost(); //获得本机IP地址情况
+        System.out.println("主机名："+ ia.getHostName());  //得到主机名
+        System.out.println("主机地址："+ ia.getHostAddress()); //得到主机地址
+
+
         serverSocket = new ServerSocket(NetConf.port);
         Socket socket=null;
             try {
                 while(true){
-
-
                 System.out.println("socket建立完成");
                 socket = serverSocket.accept(); //等待并取出用户连接，并创建套接字
                 System.out.println("socket收到消息");
