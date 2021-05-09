@@ -17,6 +17,7 @@ public class QuestionDeal {
                 +  "', `ans`='"+StringDeal.queryString(s,"#ans=")
                 +"', `difficulty`='"+StringDeal.queryString(s,"#difficulty=")+"' where id="+StringDeal.queryString(s,"#id=") ;
         try {
+            System.out.println(sql);
           sql_connection.sql_dealCh(sql);
           sql_connection.sql_end();
         } catch (SQLException throwables) {
@@ -259,22 +260,18 @@ public class QuestionDeal {
         return text;
     }
 
-    public static String Question_DataBase_to_String(int database_id, int now_id) {
+    public static String Question_DataBase_to_String_blank(int database_id) {
         Sql_connection sql_connection = new Sql_connection();
         sql_connection.sql_start();
-        String text = null;
+        String text ="";
         try {
             ResultSet set = sql_connection.sql_deal("select * from questions where id=" + database_id);
             while (set.next()) {
                 int type = Integer.valueOf(set.getString("type"));
                 if (type == 0 || type == 1) {
-                    text = "~#id=" + now_id + "#type=" + type + "#description=" + set.getString("description")
-                            + "#difficulty=" + set.getString("difficulty") + "#choice_ans="
-                            + set.getString("ans").replace("@", "")
-                            + "#";
                 } else {
-                    text = "~#id=" + now_id + "#type=" + type + "#description=" + set.getString("description")
-                            + "#difficulty=" + set.getString("difficulty")
+                    text = "~#id=" + database_id + "#type=" + type + "#description=" + set.getString("description")
+                            + "#difficulty=" + set.getString("difficulty")+"#ans="+set.getString("ans")
                                                + "#";
                 }
             }

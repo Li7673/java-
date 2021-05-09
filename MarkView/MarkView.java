@@ -3,16 +3,40 @@ package MarkView;
 import com.Components.RButton;
 import com.Components.RTextField;
 import com.Components.ScrollableLabel;
+import until.ClientConf;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.io.*;
+import java.net.Socket;
 
 public class MarkView extends JFrame {
  int height=900,width=1800;
     JTextField jt_grade;
     JLabel jl_question_description,jl_question_right_ans,jl_stu_name,jl_stu_ans;
-    public MarkView(){
+
+ public void update_stu_ans() {
+  Socket socket;
+  //客户端输出流，向服务器发消息
+  try {
+   socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
+  BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+   //客户端输入流，接收服务器消息
+   BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+   PrintWriter pw = new PrintWriter(bw, true);
+   pw.println("#code=12#");
+  String read=br.readLine();
+
+  } catch (IOException e) {
+  e.printStackTrace();
+ }
+ }
+private  void addFen_ans(){
+     jl_stu_ans.setText(jl_stu_ans.getText()+"-----------------------------------------------------------------------------------------------------------------------------------");
+}
+
+ public MarkView(){
       MarkView self=this;
      this.setTitle("批阅主观题");
      this.setSize(width,height);
@@ -45,6 +69,7 @@ public class MarkView extends JFrame {
      jl_stu_ans=new ScrollableLabel();
      jl_question_description=new ScrollableLabel();;
      jl_question_right_ans=new ScrollableLabel();
+
      jl_stu_name.setBorder(border1);
      jl_stu_ans.setBorder(border1);
      jl_question_description.setBorder(border1);
@@ -72,6 +97,8 @@ public class MarkView extends JFrame {
      jb_next.setSize(200,50);
      jb_next.setLocation(left+1100,top+710);
 
+
+      addFen_ans();
 
      add(jb_next);
      add(jt_grade);

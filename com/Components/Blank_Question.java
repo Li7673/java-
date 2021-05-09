@@ -9,5 +9,4 @@ public class   Blank_Question extends Question{
     public Blank_Question(){
     this.type=2;
     }
-
 }

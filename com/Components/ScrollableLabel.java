@@ -5,6 +5,11 @@ import java.awt.*;
 
 public   class ScrollableLabel extends JLabel implements Scrollable {
 
+          @Override
+          public void setText(String s){
+              super.setText("<html><p>"+s+"</p></html>");
+          }
+
         public Dimension getPreferredScrollableViewportSize() {
             return getPreferredSize();
 

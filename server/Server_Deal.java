@@ -82,7 +82,9 @@ public class Server_Deal extends Thread{
                     }
                     //修改题目
                     case 9:{
+
                         QuestionDeal.changeQuestion(read);
+
                         pw.println("修改成功");break;
                     }
                     //存储卷子
@@ -350,6 +352,54 @@ public class Server_Deal extends Thread{
        }
        return result;
    }
+    public static String get_stu_ans(){
+        String re="";
+        Sql_connection sql_connection=new Sql_connection();
+        sql_connection.sql_start();
+        try {
+            ResultSet resultSet= sql_connection.sql_deal("select * from "+NetConf.paper_ans_table);
+            while ( ( resultSet.next())){
+                if (resultSet.getString("blank_grade")==null){
+                re+=resultSet.getString("ans");
+                    break;
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+      return re;
+       }
+     public static String get_marking_paper_question(){
+         String re="";
+         Sql_connection sql_connection=new Sql_connection();
+         sql_connection.sql_start();
+         try {
+             ResultSet resultSet= sql_connection.sql_deal("select * from "+NetConf.paper_ans_table);
+             while ( ( resultSet.next())){
+                 if (resultSet.getString("blank_grade")==null){
+                   String paper_id=resultSet.getString("paper_id");
+                   ResultSet resultSet1=sql_connection.sql_deal("select * from "+NetConf.paper_table+" where  paper_Id="+paper_id);
+                   if(resultSet1.next())
+                   {
+                       String questions_id=resultSet1.getString("questions");
+                       String[] ids=questions_id.split("#");
+                       sql_connection.sql_end();
+                       for (String s :
+                            ids) {
+                           if(!s.equals(""))
+                           {
+                               re+=QuestionDeal.Question_DataBase_to_String_blank(Integer.parseInt(s));
+                           }
+                       }
+                   }
+                     break;
+                 }
+             }
+         } catch (SQLException throwables) {
+             throwables.printStackTrace();
+         }
+         return re;
+     }
 
 
     }
