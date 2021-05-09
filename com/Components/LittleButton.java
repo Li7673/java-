@@ -17,6 +17,8 @@ public class LittleButton extends JButton {
     String name;
     public int id;
 
+
+
     public int getId() {
         return id;
     }

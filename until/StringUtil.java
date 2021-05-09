@@ -5,6 +5,11 @@ import Sever.SeverMethod;
 import javax.swing.*;
 
 public class StringUtil {
+    public static void main(String[] args) {
+        String str="~#code=3#id=6#difficulty=2#type=1#description=fgasskgjgsja#ans=￥a￥b￥@c￥d";
+        StringUtil.AnsString(str);
+
+    }
           public static void AnsString(String s){
               String []question=s.split("~");
               for (String a : question){
@@ -23,6 +28,7 @@ public class StringUtil {
                       code=1完成注册
                        */
                       if(code==1){
+                          //需要添加单开一个线程
                           String id=a.substring(a.indexOf("#username=")+10,
                                   a.indexOf("#",a.indexOf("#username")+12));
 

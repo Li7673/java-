@@ -8,13 +8,20 @@ import until.ClientConf;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.Socket;
 
 public class MarkView extends JFrame {
  int height=900,width=1800;
-    JTextField jt_grade;
+     JTextField jt_grade;
     JLabel jl_question_description,jl_question_right_ans,jl_stu_name,jl_stu_ans;
+
+    public static void main(String[] args) {
+        new MarkView();
+
+    }
 
  public void update_stu_ans() {
   Socket socket;
@@ -37,6 +44,7 @@ private  void addFen_ans(){
 }
 
  public MarkView(){
+
       MarkView self=this;
      this.setTitle("批阅主观题");
      this.setSize(width,height);
@@ -96,7 +104,23 @@ private  void addFen_ans(){
      JButton jb_next=new RButton("下一个");
      jb_next.setSize(200,50);
      jb_next.setLocation(left+1100,top+710);
+     jb_next.addMouseListener(new MouseAdapter() {
+         @Override
+         public void mouseClicked(MouseEvent e) {
+             super.mouseClicked(e);
+             if(jt_grade.getText().equals("")){
+                 System.out.print("成绩为空");
+             }else if(!jt_grade.getText().equals("")){
+                 try {
+                    scord();
+                 } catch (IOException ioException) {
+                     ioException.printStackTrace();
+                 }
+                 jt_grade.setText("");
+             }
 
+         }
+     });
 
       addFen_ans();
 
@@ -112,5 +136,26 @@ private  void addFen_ans(){
      add(jl_question_stu_ans);
      this.setVisible(true);
  }
+
+ public void scord ()throws IOException{
+     Socket socket;
+     //客户端输出流，向服务器发消息
+     socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字
+     BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+     //客户端输入流，接收服务器消息
+    // BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+     PrintWriter pw = new PrintWriter(bw, true); //装饰输出流，及时刷
+
+     String msg="~#code=12#"+jt_grade.getText()+"#";
+     pw.println(msg);
+     //String s=br.readLine();
+     //System.out.println(s);
+
+     //br.close();
+     pw.close();
+     socket.close();
+ }
+
+
 
 }

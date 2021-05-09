@@ -2,10 +2,10 @@ package Util;
 //作为服务器和数据库处理的返回值
 public class MessageType {
        public static final String RegisterSeverManage ="1";
-       public static String LoginSeverManage(){return "2";}
-       public static String AddSeverManage(){return "3";}
-       public static String DeleteSeverManage(){return "4";}
-       public static String ReviseSeverManage(){return "5";}
-       public  static String AddQuestion(){ return "6"; }
+       public static final String LoginSeverManage= "2";
+       public static final String AddSeverManage="3";
+       public static final String DeleteSeverManage= "4";
+       public static final String ReviseSeverManage ="5";
+       public  static final  String AddQuestion= "6";
 
 }

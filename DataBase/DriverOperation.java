@@ -5,11 +5,13 @@ import java.sql.*;
 
 public class DriverOperation{
 
-
+    public static void main(String[] args) {
+        DriverOperation.insertquestion(6,1,1,"akjfhka","￥@a￥b￥c￥d￥");
+    }
     public static int insert(String id,String password,int is_teacher) {
         Connection conn = Driver.getConn();
         int i = 0;
-        String sql = "insert into studentandteacher(username,password,is_teacher) values(?,?,?)";
+        String sql = "insert into account(username,password,is_teacher) values(?,?,?)";
         PreparedStatement pstmt;
         try {
             pstmt = (PreparedStatement) conn.prepareStatement(sql);
@@ -45,12 +47,12 @@ public class DriverOperation{
               return i;
     }
 
-    public static int update(StudentandTeacher studentandteacher) {
+    public static int update(String id,String password,int is_teacher) {
         Connection conn = Driver.getConn();
         int i = 0;
-        String sql = "update studentandteacher set username='" +
-                studentandteacher.getUsername() + "' where password='" +
-                studentandteacher.getPassword() + "'";
+        String sql = "update account set username='" +
+                id + "' where password='" +
+                password + "'"+"'where is_teacher='"+is_teacher;
         PreparedStatement pstmt;
         try {
             pstmt = (PreparedStatement) conn.prepareStatement(sql);
@@ -68,7 +70,7 @@ public class DriverOperation{
         int i = 0;
         String sql = "update exam_java set id='" +
                 id+ "' where difficulty='" +
-                difficulty + "' where type='"+type+"'where description='"+description;
+                difficulty + "' where type='"+type+"'where description='"+description+"'where ans='"+ans;
         PreparedStatement pstmt;
         try {
             pstmt = (PreparedStatement) conn.prepareStatement(sql);
@@ -114,10 +116,10 @@ public class DriverOperation{
   //      String sql = "select * from exam_java";
   //  }
 
-    public static String delete(String name) {
+    public static String delete(String id) {
         Connection conn = Driver.getConn();
       String s=null;
-        String sql = "delete from studentandteacher where username='" + name + "'";
+        String sql = "delete from account where username='" + id + "'";
         PreparedStatement pstmt;
         try {
             pstmt = (PreparedStatement) conn.prepareStatement(sql);

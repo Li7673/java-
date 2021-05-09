@@ -1,7 +1,7 @@
 package com.IndexView;
 
 import com.Components.BgPanel;
-import com.Components.Paper;
+//import com.Components.Paper;
 import com.Components.RButton;
 import until.ClientConf;
 
