@@ -11,7 +11,7 @@ public class ClientSever {
         try {
             Socket socket=new Socket(localhost,PORT);
 
-            new ClientThread().start();
+          //  new ClientThread().start();
         } catch (IOException e) {
             e.printStackTrace();
         }

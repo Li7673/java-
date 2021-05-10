@@ -1,10 +1,15 @@
 package server;
 
 
+import com.ExamView.ExamView;
+import com.IndexView.StudentIndex;
 import com.IndexView.TeacherView;
-import com.mysql.cj.xdevapi.JsonArray;
+//import com.mysql.cj.xdevapi.JsonArray;
+import com.Login.SignView;
+import com.QuestionView.QuestionView;
 import until.NetConf;
 
+import javax.swing.text.View;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -12,8 +17,7 @@ import java.net.Socket;
 import java.sql.*;
 
 public class ServerMain {
-    static ServerSocket serverSocket;
-    private static final int PORT=8888; //端口
+    static ServerSocket serverSocket; //端口
 
     static Connection con;
     public static <ClassReader> void main(String[] args) throws IOException {
@@ -21,14 +25,15 @@ public class ServerMain {
         System.out.println("主机名："+ ia.getHostName());  //得到主机名
         System.out.println("主机地址："+ ia.getHostAddress()); //得到主机地址
 
+       new TeacherView();
 
         serverSocket = new ServerSocket(NetConf.port);
         Socket socket=null;
             try {
                 while(true){
-                System.out.println("socket建立完成");
+                System.out.println("socket开始监听");
                 socket = serverSocket.accept(); //等待并取出用户连接，并创建套接字
-                System.out.println("socket收到消息");
+                System.out.println("socket收到请求");
                 Server_Deal server_deal = new Server_Deal(socket);
 
 //                System.out.println("新连接，连接地址："+socket.getInetAddress()+"："+socket.getPort()); //客户端信息
@@ -47,12 +52,18 @@ public class ServerMain {
 //                }
             } //如果客户端断开连接，则应捕获该异常，但不应中断整个while循环，使得服务器能继续与其他客户端通信
 
-            }catch (IOException e) {e.printStackTrace();}finally{
-
-                if(null!=socket){try {socket.close(); //断开连接
-                } catch (IOException e) {e.printStackTrace();}}
+            }catch (IOException e) {
+                e.printStackTrace();
+            }finally{
+                if(null!=socket){
+                    try {
+                        socket.close(); //断开连接
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 serverSocket.close();
-
+                System.out.println("socket处理完成");
             }
         }
 

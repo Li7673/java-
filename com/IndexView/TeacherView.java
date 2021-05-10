@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 
 public class TeacherView  extends  JFrame{
 
@@ -76,6 +77,27 @@ public class TeacherView  extends  JFrame{
         this.setLocation((screen_width-width)/2,(screen_height-height)/2);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setVisible(true);
+
+        jb_paper_remark.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                dispose();
+                new MarkView();
+
+            }
+        });
+
+        jb_question_lib.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                dispose();
+                new QuestionView();
+
+            }
+        });
+
     }
     public void printColumnChart(){
 

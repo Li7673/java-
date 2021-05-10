@@ -212,7 +212,7 @@ public class QuestionView extends JFrame {
         jb_new_a_paper.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                PaperView paperView=new PaperView(self);
+                PaperView1 paperView=new PaperView1(self);
             }
         });
         jb_sortByType.addMouseListener(new MouseAdapter() {
@@ -255,8 +255,8 @@ public class QuestionView extends JFrame {
         jb_add.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Single_question_view single_question_view = new Single_question_view();
-                single_question_view.setFather_panel(self);
+                //Single_question_view single_question_view = new Single_question_view();
+               // single_question_view.setFather_panel(self);
             }
         });
         jp_side.setSize(220, 600);
@@ -396,9 +396,9 @@ class Question_show_box extends JPanel {
         jb_change.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Single_question_view single_question_view=new Single_question_view(question);
-                single_question_view.setFather_panel(questionView);
-                single_question_view.setQuestion_show_box(self);
+                //Single_question_view single_question_view=new Single_question_view(question);
+                //single_question_view.setFather_panel(questionView);
+               // single_question_view.setQuestion_show_box(self);
             }
         });
         jb_del.addMouseListener(
