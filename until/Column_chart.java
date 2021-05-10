@@ -13,6 +13,29 @@ public class Column_chart extends JFrame {
     int y_divisor = 20;
     int x_divisor;
     //绘制柱形统计图
+    public static int computeGreatestCommonDivisor(int c,int d) {
+        int a = c;
+        int b = d;
+        int GreatestCommonDivisor;
+        int index = 1;
+        while (a % 2 == 0 && b % 2 == 0) {
+            a = a / 2;
+            b = b / 2;
+            index = index * 2;
+        }
+        do {
+            int temp = 1;
+            if (a < b) {
+                temp = a;
+                a = b;
+                b = temp;
+            }
+            a = a - b;
+        } while (a != b);
+        GreatestCommonDivisor = index * a;
+        return GreatestCommonDivisor;
+    }
+
     class V {
         int x, y;
 
@@ -24,11 +47,18 @@ public class Column_chart extends JFrame {
 
     public Column_chart(String[] strings,int[] ints) {
         super();
-        x_arr = new String[]{"100-90", "89-70", "79-70", "69-60", "60-"};
         x_arr=strings;
         y_arr=ints;
         x_divisor = x_arr.length + 1;
-
+        int max=5;
+        int min=1;
+        for (int i:ints){
+            if(i>max)
+                max=i;
+            if(i<min&&i>1)
+                min=i;
+        }
+        y_divisor=max/computeGreatestCommonDivisor(max,min);
         setBounds(100, 100, 600, 600);
         this.setVisible(true);
     }
@@ -99,6 +129,7 @@ public class Column_chart extends JFrame {
             g2d.drawString(String.valueOf(y_arr[i - 1]),
                     origin.x + i * (x_length / x_divisor) - step / 4 + 10, origin.y - 15 - 2 * value);
             g2d.setColor(new Color(0x92FC99));
+            if(value!=0)
             g2d.fillOval(origin.x + i * (x_length / x_divisor) - step / 4, origin.y - 10 - 2 * value, step / 2 + 10, 20);
         }
     }

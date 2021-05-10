@@ -9,6 +9,7 @@ import until.*;
 import java.io.*;
 import java.net.Socket;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
@@ -25,15 +26,12 @@ public class Server_Deal extends Thread{
            this.socket=socket;
            try {
                br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
 //输出流，向客户端写信息
                bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                pw = new PrintWriter(bw, true);
                this.start();
            }catch (IOException e){
-
                e.printStackTrace();
-
            }
         }
          @Override
@@ -96,11 +94,20 @@ public class Server_Deal extends Thread{
                     case 11:{
                         int difficulty=Integer.parseInt( StringDeal.queryString(read,"#difficulty="));
                         int num=Integer.parseInt(StringDeal.queryString(read,"#num="));
-                        pw.println(PaperDeal.automaticCreatePaper(difficulty,num));
+                        pw.println(PaperDeal.automaticCreatePaper(difficulty,num));break;
                     }
                     //批阅试卷
                     case 12:{
-
+                    pw.println(insertGrade(read));break;
+                    }
+                    case 13:{
+                     pw.println(get_marking_paper_question());break;
+                    }
+                    case 14:{
+                    pw.println(get_stu_ans());break;
+                    }
+                    case 15:{
+                        pw.println(IamShaBi(Integer.parseInt( StringDeal.queryString(read,"#id="))));break;
                     }
                 }
 
@@ -278,8 +285,7 @@ public class Server_Deal extends Thread{
                    }
                }
                i=0;
-
-            String[] s_ans=s.split("~");
+               String[] s_ans=s.split("~");
                for (String s2:s_ans ) {
                    if(!s2.equals("")&&s2.indexOf("#id=")!=-1){
                        s2=s2.replace("#id="+i,"#id="+ids[i]);
@@ -301,21 +307,36 @@ public class Server_Deal extends Thread{
    public static void summit_paper(String s){
        Sql_connection sql_connection=new Sql_connection();
        sql_connection.sql_start();
-
        String questions=s.substring(s.indexOf("#questions_id=")+14,s.indexOf("￥",s.indexOf("#questions_id=")+14));
        String[]strings=questions.split("#");
        int number=0;
+       int blank_num=0;
        for (String s1:strings
             ) {
            if(!s1.equals(""))
-               number++;
+           { number++;
+               try {
+                   ResultSet resultSet =  sql_connection.sql_deal("select * from "+NetConf.questions_table+" where id="+s1);
+                   if(resultSet.next()){
+
+                       if(resultSet.getString("type").equals("2"))
+                            blank_num++;
+                   }
+               } catch (SQLException throwables) {
+                   throwables.printStackTrace();
+               }
+
+           }
        }
+
        String time=StringDeal.queryString(s,"#time=");
        String choice=StringDeal.queryString(s,"#choice_grade=");
        String blank=StringDeal.queryString(s,"#blank_grade=");
        String num=StringDeal.queryString(s,"#num=");
-       String sql="Insert into "+NetConf.paper_table+" ( `questions`, `name`, `time`,`number`,`choice_grade`, `blank_grade` ) "
-               +" values ( '"+questions+"','"+StringDeal.queryString(s,"#name=")+"','"+time+"','"+number+"','"+choice+"','"+blank+"' ) ";
+       int total=blank_num*Integer.parseInt(blank)+(Integer.parseInt( num)-blank_num)*Integer.parseInt( choice);
+       String sql="Insert into "+NetConf.paper_table+" ( `questions`, `name`, `time`,`number`,`choice_grade`, `blank_grade`, `total_grade` ) "
+               +" values ( '"+questions+"','"+StringDeal.queryString(s,"#name=")+"','"+time+"','"+number+"','"+choice+"','"
+               +blank+" ', '"+total + "' ) ";
        System.out.println(sql);
        try {
            sql_connection.sql_dealCh(sql);
@@ -378,9 +399,10 @@ public class Server_Deal extends Thread{
              while ( ( resultSet.next())){
                  if (resultSet.getString("blank_grade")==null){
                    String paper_id=resultSet.getString("paper_id");
+
                    ResultSet resultSet1=sql_connection.sql_deal("select * from "+NetConf.paper_table+" where  paper_Id="+paper_id);
                    if(resultSet1.next())
-                   {
+                   {   re+="#blank_grade="+resultSet1.getString("blank_grade");
                        String questions_id=resultSet1.getString("questions");
                        String[] ids=questions_id.split("#");
                        sql_connection.sql_end();
@@ -388,7 +410,7 @@ public class Server_Deal extends Thread{
                             ids) {
                            if(!s.equals(""))
                            {
-                               re+=QuestionDeal.Question_DataBase_to_String_blank(Integer.parseInt(s));
+                               re+=QuestionDeal.Question_DataBase_to_String_blank(Integer.parseInt(s))+"#";
                            }
                        }
                    }
@@ -398,10 +420,92 @@ public class Server_Deal extends Thread{
          } catch (SQLException throwables) {
              throwables.printStackTrace();
          }
+         System.out.println(re);
          return re;
      }
 
+     public static String  IamShaBi(int id ) {
+          String result="";
+         Sql_connection sql_connection=new Sql_connection();
+         sql_connection.sql_start();
+         int to=0;
+         try {
+             int max=0;
+             ArrayList<Integer> arrayList=new ArrayList<>();
+             ResultSet resultSet= sql_connection.sql_deal("select * from "+NetConf.paper_ans_table+" where paper_id="+id);
+             while (resultSet.next()){
+               int total=resultSet.getInt("total_grade");
+               if(total>max){
+                   max=total;
+               }
+               arrayList.add(total);
+             }
 
+             String sql2="select * from " +NetConf.paper_table+" where paper_Id="+id;
+             ResultSet resultSet1=sql_connection.sql_deal(sql2);
+             if(resultSet1.next()){
+                 to=Integer.parseInt( resultSet1.getString("total_grade"));
+             }
+             int di=to>=5?to/5:1;
+             System.out.println(di);
+             arrayList.sort(Comparable::compareTo);
+             System.out.println(arrayList);
+             int []ids=new int[5];
+             for (Integer i:
+                  arrayList) {
+                 ids [i/di]++;
+//
+             }
+             for (int i:ids
+                  ) {
+                 result+="￥"+i;
+             }
+             System.out.println(result);
+         } catch (SQLException throwables) {
+             throwables.printStackTrace();
+         }
+       return "#arr="+result+"#total="+to+"#";
+     }
+    public static String insertGrade(String s) {
+        String re = "err";
+        String blank_grade =StringDeal.queryString(s,"#blank=");
+        try {
+           Sql_connection sql_connection=new Sql_connection();
+           sql_connection.sql_start();
+            ResultSet resultSet= sql_connection.sql_deal("select * from "+NetConf.paper_ans_table);
+            while ( ( resultSet.next())){
+                if (resultSet.getString("blank_grade")==null) {
+                    String id=resultSet.getString("id");
+                   int ch=Integer.parseInt( resultSet.getString("choice_grade"));
+                   int total=ch+Integer.parseInt(blank_grade);
+                    String sql = "  update " + NetConf.paper_ans_table +" set blank_grade="+blank_grade+", total_grade= "+total
+                            +" where id="+id;
+                    sql_connection.sql_dealCh(sql);
+                    re="success";
+                    break;
+                }}
+            sql_connection.sql_end();
+        } catch (SQLException | NullPointerException e) {
+           e.printStackTrace();
+        }
+        return re;
+    }
+
+   public static String get_stu_sort(int  id){
+           Sql_connection sql_connection=new Sql_connection();
+           sql_connection.sql_start();
+           String re="";
+       try {
+
+           ResultSet resultSet=sql_connection.sql_deal(" select * from "+NetConf.paper_ans_table+" where paper_id="+id);
+           while (resultSet.next()){
+              re+="~#stu_id="+resultSet.getString("stu_id")+"#total_grade="+resultSet.getString("total_grade");
+           }
+       } catch (SQLException throwables) {
+           throwables.printStackTrace();
+       }
+       return  re;
+   }
     }
 
 

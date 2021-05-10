@@ -18,5 +18,21 @@ public class StringDeal {
         }
     return count;
     }
+   public static String ArrayToString(String []strings){
+        String re="";
+       for (String s:
+            strings) {
+          re+="￥"+s;
+       }
+       return re;
+   }
+   public  static String ArrayToString(int []ints){
+       String re="";
+       for (int s:
+               ints) {
+           re+="￥"+s;
+       }
+       return re;
+   }
 
 }

@@ -103,8 +103,8 @@ public class SignView extends JFrame {
                 if(!new String((jt_repassord.getPassword())).equals(new String(jt_repassord.getPassword())))
                     jl_warning.setText("两次密码需要相同");
                 else
-                if(jt_password.getPassword().length<8||jt_password.getPassword().length>20){
-                    jl_warning.setText("密码长度应该在8到20位");
+                if(jt_password.getPassword().length<6||jt_password.getPassword().length>20){
+                    jl_warning.setText("密码长度应该在6到20位");
                 }else {
                     try {
                         sign_sum();

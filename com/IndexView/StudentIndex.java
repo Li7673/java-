@@ -66,7 +66,7 @@ public class StudentIndex extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setVisible(true);
     }
-    public String[] getPapers() throws IOException{
+    public static String[] getPapers() throws IOException{
         Socket socket;
         //客户端输出流，向服务器发消息
         socket = new Socket(ClientConf.server_host, ClientConf.port); //创建客户端套接字

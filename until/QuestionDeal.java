@@ -136,8 +136,8 @@ public class QuestionDeal {
                                     s.indexOf("#", s.indexOf("#ans=") + 6));
                             int ri = 0;
                             for (String s1 : ar_ans) {
-                                if (!s1.equals("")) {
-                                    if (s1.contains("@")) {
+                                if (s1.equals("")) {
+                                    if (!s1.contains("@")) {
                                         ans_s1 += s1;
                                         ri++;
                                     }
